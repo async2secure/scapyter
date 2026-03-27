@@ -85,8 +85,12 @@ class H5TraceRepository(TraceRepository):
         )
 
     @property
-    def total_traces(self) -> int:
+    def total_trace_count(self) -> int:
         return self._hf["traces"].shape[0]
+
+    @property
+    def total_sample_count(self) -> int:
+        return self._hf["traces"].shape[1]
 
     def close(self):
         self._hf.close()
