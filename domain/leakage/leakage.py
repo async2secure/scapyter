@@ -10,7 +10,7 @@ class LeakageModel(ABC):
 
     @abstractmethod
     def calculate(
-            self, known_data: np.ndarray, byte_location: int, key_guess: int
+        self, known_data: np.ndarray, byte_location: int, key_guess: int
     ) -> np.ndarray:
         raise NotImplementedError
 
@@ -18,7 +18,7 @@ class LeakageModel(ABC):
 class InvSboxOutputLeakageModel(LeakageModel):
 
     def calculate(
-            self, known_data: np.ndarray, byte_location: int, key_guess: int
+        self, known_data: np.ndarray, byte_location: int, key_guess: int
     ) -> np.ndarray:
         sliced_data = known_data[:, byte_location]
         state = sliced_data ^ key_guess
@@ -29,7 +29,7 @@ class InvSboxOutputLeakageModel(LeakageModel):
 class SboxOutputLeakageModel(LeakageModel):
 
     def calculate(
-            self, known_data: np.ndarray, byte_location: int, key_guess: int
+        self, known_data: np.ndarray, byte_location: int, key_guess: int
     ) -> np.ndarray:
         plaintext_byte = known_data[:, byte_location]
         state = plaintext_byte ^ key_guess

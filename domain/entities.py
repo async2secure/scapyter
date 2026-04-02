@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 import numpy as np
-from typing import Dict
 
 
 @dataclass
@@ -21,7 +20,7 @@ class InputTraceBatch:
 class OutputTraceBatch:
     indices: range
     samples: np.ndarray  # Shape: (N, Samples)
-    metadata: Dict[str, np.ndarray]  # Values are Shape: (N, Bytes)
+    metadata: dict[str, np.ndarray]  # Values are Shape: (N, Bytes)
 
     def __len__(self):
         return self.samples.shape[0]
@@ -33,7 +32,7 @@ class TraceEntity:
 
     index: int
     samples: np.ndarray
-    metadata: Dict[str, np.ndarray] = field(default_factory=dict)
+    metadata: dict[str, np.ndarray] = field(default_factory=dict)
 
     def __getitem__(self, key: str):
         return self.metadata.get(key)

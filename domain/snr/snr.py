@@ -39,7 +39,7 @@ class _GroupedStreamingStats:
 
         # Compute M2 (within chunk)
         centered = traces - means[inverse]
-        sq = centered ** 2
+        sq = centered**2
 
         m2s = np.zeros((n_groups, self._trace_dim), dtype=np.float64)
         np.add.at(m2s, inverse, sq)
@@ -67,7 +67,7 @@ class _GroupedStreamingStats:
                 total = c1 + c2
 
                 self._means[key] = m1 + delta * (c2 / total)
-                self._m2s[key] = s1 + s2 + (delta ** 2) * (c1 * c2 / total)
+                self._m2s[key] = s1 + s2 + (delta**2) * (c1 * c2 / total)
                 self._counts[key] = total
 
     # -----------------------------

@@ -49,7 +49,11 @@ def test_wrong_guess_produces_different_leakage():
     plaintexts = np.array([[0x42]], dtype=np.uint8)
     model = SboxOutputLeakageModel()
 
-    leakage_guess_1 = model.calculate(byte_location= 0, key_guess=0x01,known_data=plaintexts)
-    leakage_guess_2 = model.calculate(byte_location=0, key_guess=0x02, known_data=plaintexts)
+    leakage_guess_1 = model.calculate(
+        byte_location=0, key_guess=0x01, known_data=plaintexts
+    )
+    leakage_guess_2 = model.calculate(
+        byte_location=0, key_guess=0x02, known_data=plaintexts
+    )
 
     assert leakage_guess_1 != leakage_guess_2

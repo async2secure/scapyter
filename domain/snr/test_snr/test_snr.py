@@ -22,7 +22,7 @@ def reference_snr(traces: np.ndarray, labels: np.ndarray) -> np.ndarray:
 
     # Noise variance
     centered = traces - means[inverse]
-    sq = centered ** 2
+    sq = centered**2
     sq_sums = np.zeros((n_groups, D))
     np.add.at(sq_sums, inverse, sq)
     variances = sq_sums / counts[:, None]
@@ -83,7 +83,9 @@ def test_streaming_equivalence():
     psnr = ProgressiveSnr(Range.from_zero_start(D))
     chunk_size = 500
     for i in range(0, N, chunk_size):
-        psnr.update(traces=traces[i:i + chunk_size], hex_array=labels[i:i + chunk_size])
+        psnr.update(
+            traces=traces[i : i + chunk_size], hex_array=labels[i : i + chunk_size]
+        )
 
     out = psnr.finalize()
     np.testing.assert_allclose(out, ref, rtol=1e-6, atol=1e-8)

@@ -86,9 +86,13 @@ class AesKeyScheduler:
             mod_initial_round = self.initial_round
 
         if self.initial_round < self.desired_round:
-            expanded = self._forward_expand(mod_initial_round, mod_desired_round, key_list)
+            expanded = self._forward_expand(
+                mod_initial_round, mod_desired_round, key_list
+            )
         else:
-            expanded = self._backward_expand(mod_initial_round, mod_desired_round, key_list)
+            expanded = self._backward_expand(
+                mod_initial_round, mod_desired_round, key_list
+            )
 
         return bytes(self._slice_key_if_needed(expanded, self.desired_round))
 
@@ -117,18 +121,22 @@ class AesKeyScheduler:
         round_count = start
         while round_count < end:
             round_count += 1
-            state[:4] = AesKeyScheduler._new_state(state[:4], state[-4:], K_RCON[round_count])
+            state[:4] = AesKeyScheduler._new_state(
+                state[:4], state[-4:], K_RCON[round_count]
+            )
 
             for i in range(4, key_len, 4):
-                inp = state[i-4:i]
+                inp = state[i - 4 : i]
                 if key_len == 32 and i == 16:
                     inp = [K_SBOX[x] for x in inp]
-                state[i:i+4] = [x ^ y for x, y in zip(state[i:i+4], inp)]
+                state[i : i + 4] = [x ^ y for x, y in zip(state[i : i + 4], inp)]
 
         return state
 
     @staticmethod
-    def _backward_expand(initial_round: int, desired_round: int, state: List[int]) -> List[int]:
+    def _backward_expand(
+        initial_round: int, desired_round: int, state: List[int]
+    ) -> List[int]:
         key_len = len(state)
         round_count = initial_round
 
@@ -138,16 +146,23 @@ class AesKeyScheduler:
                 old_state = state[16:32]
                 state[16:32] = state[:16]
                 for i in range(12, 0, -4):
-                    state[i:i+4] = [x ^ y for x, y in zip(old_state[i:i+4], old_state[i-4:i])]
-                state[:4] = AesKeyScheduler._new_state(old_state[:4], state[-4:], K_RCON[7])
+                    state[i : i + 4] = [
+                        x ^ y
+                        for x, y in zip(old_state[i : i + 4], old_state[i - 4 : i])
+                    ]
+                state[:4] = AesKeyScheduler._new_state(
+                    old_state[:4], state[-4:], K_RCON[7]
+                )
 
-            for i in range(key_len-4, 0, -4):
-                inp = state[i-4:i]
+            for i in range(key_len - 4, 0, -4):
+                inp = state[i - 4 : i]
                 if key_len == 32 and i == 16:
                     inp = [K_SBOX[x] for x in inp]
-                state[i:i+4] = [x ^ y for x, y in zip(state[i:i+4], inp)]
+                state[i : i + 4] = [x ^ y for x, y in zip(state[i : i + 4], inp)]
 
-            state[:4] = AesKeyScheduler._new_state(state[:4], state[-4:], K_RCON[round_count])
+            state[:4] = AesKeyScheduler._new_state(
+                state[:4], state[-4:], K_RCON[round_count]
+            )
             round_count -= 1
 
         return state
