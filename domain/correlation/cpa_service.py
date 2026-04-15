@@ -9,6 +9,7 @@ from domain.value_object import (
     TraceAndModeledLeakage,
     DataSource,
     KeyByteGuesses,
+    CpaByteResult,
 )
 
 
@@ -58,4 +59,6 @@ class CorrelationTask:
                 traces=batch.traces, modeled_leakage=np.asarray(modeled_leakages).T
             )
             self._correlation.update(trace_and_modeled_leakage)
-        return self._correlation.compute()
+        return CpaByteResult(
+            self._byte_location, self._key_byte_guesses, self._correlation.compute()
+        )

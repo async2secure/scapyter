@@ -169,3 +169,10 @@ class RangeParameters:
 class DataSource(Enum):
     PLAINTEXT = "plaintext"
     CIPHERTEXT = "ciphertext"
+
+
+@dataclass(frozen=True)
+class CpaByteResult:
+    byte_index: int
+    key_candidates: KeyByteGuesses
+    corr_matrix: np.ndarray

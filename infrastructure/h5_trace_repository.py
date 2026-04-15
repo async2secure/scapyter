@@ -61,9 +61,7 @@ class H5TraceRepository(TraceRepository):
 
         return SingleBatch(index=index, trace=trace, metadata=metadata)
 
-    def get_batch(
-        self, trace_range: Range, sample_slice: slice = slice(None)
-    ) -> Batch:
+    def get_batch(self, trace_range: Range, sample_slice: slice = slice(None)) -> Batch:
         """
         High-performance bulk loader.
         Requests data in contiguous blocks to minimize HDF5 I/O overhead.

@@ -48,4 +48,4 @@ guessed_key = visualizer.get_full_key_guess()
 print(f"Guessed Key: {guessed_key.hex().upper()}")
 
 plotter = CorrelationPlotter(results)
-plotter.plot_cpa_results(1)
+plotter.plot(1)
