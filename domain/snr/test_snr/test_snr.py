@@ -1,7 +1,6 @@
 import numpy as np
 
 from domain.snr.snr import ProgressiveSnr
-from domain.value_object import Range
 
 
 # -----------------------------
@@ -41,7 +40,7 @@ def test_smoke():
     traces = np.random.randn(N, D)
     labels = np.random.randint(0, 4, size=N)
 
-    psnr = ProgressiveSnr(Range.from_zero_start(D))
+    psnr = ProgressiveSnr()
     psnr.update(traces=traces, hex_array=labels)
     out = psnr.finalize()
 
@@ -60,7 +59,7 @@ def test_correctness():
 
     ref = reference_snr(traces, labels)
 
-    psnr = ProgressiveSnr(Range.from_zero_start(D))
+    psnr = ProgressiveSnr()
     psnr.update(traces=traces, hex_array=labels)
     out = psnr.finalize()
 
@@ -80,7 +79,7 @@ def test_streaming_equivalence():
     ref = reference_snr(traces, labels)
 
     # streaming in chunks
-    psnr = ProgressiveSnr(Range.from_zero_start(D))
+    psnr = ProgressiveSnr()
     chunk_size = 500
     for i in range(0, N, chunk_size):
         psnr.update(
@@ -92,15 +91,6 @@ def test_streaming_equivalence():
 
 
 # -----------------------------
-# Edge case: empty input
-# -----------------------------
-def test_empty_input():
-    psnr = ProgressiveSnr(Range.from_zero_start(10))
-    out = psnr.finalize()
-    assert out.size == 0
-
-
-# -----------------------------
 # Edge case: single group
 # -----------------------------
 def test_single_group():
@@ -108,7 +98,7 @@ def test_single_group():
     traces = np.random.randn(N, D)
     labels = np.zeros(N)  # all same
 
-    psnr = ProgressiveSnr(Range.from_zero_start(D))
+    psnr = ProgressiveSnr()
     psnr.update(traces=traces, hex_array=labels)
     out = psnr.finalize()
 
@@ -123,7 +113,7 @@ def test_small_counts():
     traces = np.random.randn(3, 10)
     labels = np.array([0, 1, 1])
 
-    psnr = ProgressiveSnr(Range.from_zero_start(10))
+    psnr = ProgressiveSnr()
     psnr.update(traces=traces, hex_array=labels)
     out = psnr.finalize()
     assert out.shape == (10,)

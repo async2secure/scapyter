@@ -1,9 +1,8 @@
 import os
 import h5py
 
-from domain.entities import TraceEntity, OutputTraceBatch
 from domain.repository.trace_repository import TraceRepository
-from domain.value_object import Range
+from domain.value_object import Range, SingleBatch, Batch
 
 
 class H5TraceRepository(TraceRepository):
@@ -48,9 +47,11 @@ class H5TraceRepository(TraceRepository):
 
         return mapping
 
-    def get_trace(self, index: int, sample_slice: slice = slice(None)) -> TraceEntity:
+    def get_single_batch(
+        self, index: int, sample_slice: slice = slice(None)
+    ) -> SingleBatch:
         """The core Repository method: Returns a Domain Entity."""
-        samples = self._hf["traces"][index, sample_slice]
+        trace = self._hf["traces"][index, sample_slice]
 
         metadata = {}
         for name, dataset in self._map.items():
@@ -58,11 +59,11 @@ class H5TraceRepository(TraceRepository):
             data = dataset[index]
             metadata[name] = data
 
-        return TraceEntity(index=index, samples=samples, metadata=metadata)
+        return SingleBatch(index=index, trace=trace, metadata=metadata)
 
     def get_batch(
         self, trace_range: Range, sample_slice: slice = slice(None)
-    ) -> OutputTraceBatch:
+    ) -> Batch:
         """
         High-performance bulk loader.
         Requests data in contiguous blocks to minimize HDF5 I/O overhead.
@@ -78,9 +79,9 @@ class H5TraceRepository(TraceRepository):
             # metadata_block['plaintext'] = dataset[start:end]
             metadata_block[name] = dataset[trace_range.start : trace_range.end]
 
-        return OutputTraceBatch(
+        return Batch(
             indices=range(trace_range.start, trace_range.end),
-            samples=samples_block,
+            traces=samples_block,
             metadata=metadata_block,
         )
 

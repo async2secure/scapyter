@@ -1,9 +1,39 @@
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Iterator
 
 import numpy as np
+
+
+@dataclass(frozen=True)
+class Batch:
+    indices: range
+    traces: np.ndarray  # Shape: (N, Samples)
+    metadata: dict[str, np.ndarray]  # Values are Shape: (N, Bytes)
+
+    def __len__(self):
+        return self.traces.shape[0]
+
+
+@dataclass(frozen=True)
+class SingleBatch:
+    """A single trace and all its associated metadata."""
+
+    index: int
+    trace: np.ndarray
+    metadata: dict[str, np.ndarray] = field(default_factory=dict)
+
+    def __getitem__(self, key: str):
+        return self.metadata.get(key)
+
+    @property
+    def plaintext(self):
+        return self.metadata.get("plaintext")
+
+    @property
+    def key(self):
+        return self.metadata.get("key")
 
 
 @dataclass(frozen=True)

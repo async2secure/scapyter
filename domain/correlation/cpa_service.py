@@ -55,7 +55,7 @@ class CorrelationTask:
                 modeled_leakages.append(modeled_leakage)
 
             trace_and_modeled_leakage = TraceAndModeledLeakage(
-                traces=batch.samples, modeled_leakage=np.asarray(modeled_leakages).T
+                traces=batch.traces, modeled_leakage=np.asarray(modeled_leakages).T
             )
             self._correlation.update(trace_and_modeled_leakage)
         return self._correlation.compute()

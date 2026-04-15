@@ -49,8 +49,6 @@ class SnrTask:
                 key_guess=self._known_key_byte,
             )
 
-            self._snr.update(
-                traces=batch.samples, hex_array=np.asarray(modeled_leakage)
-            )
+            self._snr.update(traces=batch.traces, hex_array=np.asarray(modeled_leakage))
 
         return self._snr.finalize()

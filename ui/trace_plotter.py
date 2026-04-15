@@ -11,10 +11,10 @@ class TracePlotter:
 
     def plot_single(self, index, sample_range=slice(None), color="blue"):
         """Plots a single trace from the repository."""
-        trace = self.repo.get_trace(index, sample_slice=sample_range)
+        trace = self.repo.get_single_batch(index, sample_slice=sample_range)
 
         plt.figure(figsize=(12, 4))
-        plt.plot(trace.samples, color=color, linewidth=0.7)
+        plt.plot(trace.trace, color=color, linewidth=0.7)
         plt.title(f"Trace {index}")
         plt.xlabel("Sample Index")
         plt.ylabel("Amplitude")
@@ -27,8 +27,8 @@ class TracePlotter:
         batch = self.repo.get_batch(trace_range, sample_slice=sample_range)
 
         plt.figure(figsize=(12, 5))
-        for i in range(len(batch.samples)):
-            plt.plot(batch.samples[i], alpha=alpha, linewidth=0.5)
+        for i in range(len(batch.trace)):
+            plt.plot(batch.trace[i], alpha=alpha, linewidth=0.5)
 
         plt.title(f"Overlay: Traces {trace_range.start} to {trace_range.end}")
         plt.xlabel("Sample Index")
@@ -39,8 +39,8 @@ class TracePlotter:
         """Plots the mean and standard deviation of a batch."""
         batch = self.repo.get_batch(trace_range, sample_slice=sample_range)
 
-        mean_trace = np.mean(batch.samples, axis=0)
-        std_trace = np.std(batch.samples, axis=0)
+        mean_trace = np.mean(batch.trace, axis=0)
+        std_trace = np.std(batch.trace, axis=0)
 
         plt.figure(figsize=(12, 5))
         plt.plot(mean_trace, label="Mean", color="black", linewidth=1)
@@ -53,6 +53,6 @@ class TracePlotter:
             label="Std Dev",
         )
 
-        plt.title(f"Statistical Analysis (N={len(batch.samples)})")
+        plt.title(f"Statistical Analysis (N={len(batch.trace)})")
         plt.legend()
         plt.show()

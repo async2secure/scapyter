@@ -15,7 +15,6 @@ class SnrPlotter:
         plt.figure(figsize=(10, 4))
         plt.plot(self.snr, linewidth=1, color="red")
 
-
         plt.xlabel("Samples")
         plt.ylabel("SNR")
 
