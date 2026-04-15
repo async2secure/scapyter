@@ -100,14 +100,21 @@ class ProgressiveSnr:
         - finalize()
     """
 
-    def __init__(self, trace_sample_range: Range):
-        self._trace_dim = trace_sample_range.count
-        self._stats = _GroupedStreamingStats(self._trace_dim)
+    def __init__(self):
+        self._trace_dim = None
+        self._stats = None
 
     def update(self, *, traces: np.ndarray, hex_array: np.ndarray) -> None:
         """
         Accepts chunks of data.
         """
+        if self._stats is None:
+            self._trace_dim = traces.shape[1]
+            self._stats = _GroupedStreamingStats(self._trace_dim)
+
+        elif traces.shape[1] != self._trace_dim:
+            raise ValueError("Trace dimension mismatch")
+
         self._stats.update_chunk(traces, hex_array)
 
     def finalize(self) -> np.ndarray:

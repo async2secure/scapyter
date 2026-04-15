@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from domain.correlation.cpa_correlation import CpaCorrelation
 from domain.correlation.cpa_service import CorrelationTask
 from domain.leakage.leakage import SboxOutputLeakageModel
-from domain.value_object import RangeParameters, Range, KeyGuessList, DataSource
+from domain.value_object import RangeParameters, Range, KeyByteGuesses, DataSource
 from infrastructure.h5_trace_repository import H5TraceRepository
 from ui.correlation_plotter import CorrelationPlotter
 from ui.key_rank_visualizer import KeyRankVisualizer
@@ -13,7 +13,7 @@ byte_location = 1
 range_parameter = RangeParameters(
     trace_range=Range(0, 125),
     trace_sample_range=Range(14000, 44000),
-    key_guess_list=KeyGuessList.from_full256_range(),
+    key_guess_list=KeyByteGuesses.from_full256_range(),
 )
 file_path = "data/smart-card-project/smart_card_project.sx"
 

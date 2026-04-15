@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from domain.value_object import KeyGuessList, TraceAndModeledLeakage
+from domain.value_object import KeyByteGuesses, TraceAndModeledLeakage
 
 
 class Correlation(ABC):

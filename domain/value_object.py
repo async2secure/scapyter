@@ -1,3 +1,4 @@
+import random
 from dataclasses import dataclass
 from enum import Enum
 from typing import Iterator
@@ -6,7 +7,7 @@ import numpy as np
 
 
 @dataclass(frozen=True)
-class KeyGuessList:
+class KeyByteGuesses:
     values: list[int]
 
     def __post_init__(self) -> None:
@@ -21,21 +22,32 @@ class KeyGuessList:
         return {"guess_range": self.values}
 
     @classmethod
-    def from_dict(cls, value: dict[str, any]) -> "KeyGuessList":
-        return KeyGuessList(value["guess_range"])
+    def from_dict(cls, value: dict[str, any]) -> "KeyByteGuesses":
+        return KeyByteGuesses(value["guess_range"])
 
     @property
     def number_of_guesses(self) -> int:
         return len(self.values)
 
     @classmethod
-    def from_full256_range(cls) -> "KeyGuessList":
+    def from_full256_range(cls) -> "KeyByteGuesses":
         return cls(list(range(256)))
 
-    def difference(self, other: "KeyGuessList") -> "KeyGuessList":
+    def difference(self, other: "KeyByteGuesses") -> "KeyByteGuesses":
         """Returns a new GuessRange with the difference of the values."""
         new_values = sorted(set(self.values).difference(other.values))
-        return KeyGuessList(new_values)
+        return KeyByteGuesses(new_values)
+
+    @classmethod
+    def with_correct_and_random_key_bytes(
+        cls, *, correct_key_byte: int, num_random_key_bytes: int
+    ) -> "KeyByteGuesses":
+        numbers = random.sample(
+            [i for i in range(256) if i != correct_key_byte], num_random_key_bytes
+        )
+        result = [correct_key_byte] + numbers
+        random.shuffle(result)
+        return KeyByteGuesses(result)
 
     def __iter__(self) -> Iterator[int]:
         return iter(self.values)
@@ -122,7 +134,6 @@ class Range:
 class RangeParameters:
     trace_range: Range
     trace_sample_range: Range
-    key_guess_list: KeyGuessList
 
 
 class DataSource(Enum):
