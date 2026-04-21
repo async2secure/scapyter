@@ -1,10 +1,10 @@
 import numpy as np
 
-from domain.leakage.leakage import LeakageModel
-from domain.progress_range.progress_range import get_progress_batch
-from domain.repository.trace_repository import TraceRepository
-from domain.snr.snr import ProgressiveSnr
-from domain.value_object import RangeParameters, DataSource
+from scapyter.domain.leakage.leakage import LeakageModel
+from scapyter.domain.progress_range.progress_range import get_progress_batch
+from scapyter.domain.repository.trace_repository import TraceRepository
+from scapyter.domain.snr.snr import ProgressiveSnr
+from scapyter.domain.value_object import RangeParameters, DataSource
 
 
 class SnrTask:

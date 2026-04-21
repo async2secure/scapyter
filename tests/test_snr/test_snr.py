@@ -1,6 +1,6 @@
 import numpy as np
 
-from domain.snr.snr import ProgressiveSnr
+from scapyter.domain.snr.snr import ProgressiveSnr
 
 
 # -----------------------------

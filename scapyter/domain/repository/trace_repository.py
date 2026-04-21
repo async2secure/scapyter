@@ -1,6 +1,6 @@
 from abc import ABC
 
-from domain.value_object import Range, Batch
+from scapyter.domain.value_object import Range, Batch
 
 
 class TraceRepository(ABC):

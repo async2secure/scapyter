@@ -1,4 +1,4 @@
-from domain.value_object import CpaByteResult
+from scapyter.domain.value_object import CpaByteResult
 
 
 import numpy as np

@@ -1,4 +1,4 @@
-from domain.value_object import Range
+from scapyter.domain.value_object import Range
 
 
 def get_progress_batch(

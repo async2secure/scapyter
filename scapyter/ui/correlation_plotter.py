@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from domain.value_object import CpaByteResult
+from scapyter.domain.value_object import CpaByteResult
 
 
 class CorrelationPlotter:

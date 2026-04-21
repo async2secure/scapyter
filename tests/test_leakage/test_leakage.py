@@ -1,6 +1,6 @@
 import numpy as np
 
-from domain.leakage.leakage import SboxOutputLeakageModel
+from scapyter.domain.leakage.leakage import SboxOutputLeakageModel
 
 
 def test_sbox_leakage_calculation():

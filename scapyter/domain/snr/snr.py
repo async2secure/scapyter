@@ -1,8 +1,6 @@
 from typing import Dict, List
 import numpy as np
 
-from domain.value_object import Range
-
 
 class _GroupedStreamingStats:
     """

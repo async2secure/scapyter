@@ -1,8 +1,8 @@
 import os
 import h5py
 
-from domain.repository.trace_repository import TraceRepository
-from domain.value_object import Range, SingleBatch, Batch
+from scapyter.domain.repository.trace_repository import TraceRepository
+from scapyter.domain.value_object import Range, SingleBatch, Batch
 
 
 class H5TraceRepository(TraceRepository):

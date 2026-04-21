@@ -2,8 +2,8 @@ from abc import abstractmethod, ABC
 
 import numpy as np
 
-from domain.leakage.constants.humming_weight_value import HW
-from domain.leakage.constants.sbox_values import SBOX, INV_SBOX
+from scapyter.domain.leakage.constants.hamming_weight_value import HW
+from scapyter.domain.leakage.constants.sbox_values import SBOX, INV_SBOX
 
 
 class LeakageModel(ABC):

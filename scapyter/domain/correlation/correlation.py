@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from domain.value_object import KeyByteGuesses, TraceAndModeledLeakage
+from scapyter.domain.value_object import TraceAndModeledLeakage
 
 
 class Correlation(ABC):

@@ -2,8 +2,8 @@ from typing import Optional
 import numpy as np
 from numba import jit
 
-from domain.correlation.correlation import Correlation
-from domain.value_object import TraceAndModeledLeakage
+from scapyter.domain.correlation.correlation import Correlation
+from scapyter.domain.value_object import TraceAndModeledLeakage
 
 
 @jit(nopython=True)
