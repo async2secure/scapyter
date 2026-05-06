@@ -165,6 +165,14 @@ class RangeParameters:
     trace_range: Range
     trace_sample_range: Range
 
+    @property
+    def trace_count(self) -> int:
+        return self.trace_range.count
+
+    @property
+    def sample_count(self) -> int:
+        return self.trace_sample_range.count
+
 
 class DataSource(Enum):
     PLAINTEXT = "plaintext"

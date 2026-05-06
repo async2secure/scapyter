@@ -1,5 +1,3 @@
-
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -15,10 +13,7 @@ class CorrelationPlotter:
 
     def plot(self, byte_index: int):
         # find result object
-        result = next(
-            (r for r in self.results if r.byte_index == byte_index),
-            None
-        )
+        result = next((r for r in self.results if r.byte_index == byte_index), None)
 
         if result is None:
             print(f"Error: No results found for Byte {byte_index}")
