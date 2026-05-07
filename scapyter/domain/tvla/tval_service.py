@@ -61,3 +61,7 @@ class TvlaService:
             self._acc_odd_sq,
             self._count_odd,
         )
+    def run_max_t(self, batch_size: int = 50) -> float:
+        """Returns only the absolute maximum t-score."""
+        t_scores = self.run(batch_size)
+        return np.max(np.abs(t_scores))
