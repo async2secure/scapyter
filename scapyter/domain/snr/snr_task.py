@@ -2,7 +2,7 @@ import numpy as np
 
 from scapyter.domain.leakage.leakage import LeakageModel
 from scapyter.domain.progress_range.progress_range import get_progress_batch
-from scapyter.domain.repository.trace_repository import TraceRepository
+from scapyter.domain.repository.project_file_reader import ProjectFileReader
 from scapyter.domain.snr.snr import ProgressiveSnr
 from scapyter.domain.value_object import RangeParameters, DataSource
 
@@ -14,14 +14,14 @@ class SnrTask:
         range_parameters: RangeParameters,
         known_key_byte: int,
         leakage_model: LeakageModel,
-        trace_repository: TraceRepository,
+        project_file_reader: ProjectFileReader,
         data_source: DataSource,
         snr: ProgressiveSnr,
     ) -> None:
         self._byte_location = byte_location
         self._range_parameters = range_parameters
         self._leakage_model = leakage_model
-        self._trace_repository = trace_repository
+        self._project_file_reader = project_file_reader
         self._data_source = data_source
         self._snr = snr
         self._known_key_byte = known_key_byte
@@ -38,7 +38,7 @@ class SnrTask:
         for batch_range in batch_range_list:
             sample_range = self._range_parameters.trace_sample_range
 
-            batch = self._trace_repository.get_batch(
+            batch = self._project_file_reader.get_batch(
                 batch_range, sample_slice=slice(sample_range.start, sample_range.end)
             )
             known_data = batch.metadata[self._data_source.value]

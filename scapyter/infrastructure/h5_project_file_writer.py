@@ -3,7 +3,7 @@ import h5py
 from domain.value_object import Batch
 
 
-class ProjectFileWriter:
+class H5ProjectFileWriter:
     def __init__(self, file_path: str, total_traces: int):
         self.file_path = file_path
         self.total_traces = total_traces

@@ -1,16 +1,16 @@
 import numpy as np
 
 from scapyter.domain.progress_range.progress_range import get_progress_batch
-from scapyter.domain.repository.trace_repository import TraceRepository
+from scapyter.domain.repository.project_file_reader import ProjectFileReader
 from scapyter.domain.tvla.tvla_calculator import TvlaCalculator
 from scapyter.domain.value_object import Range, RangeParameters
 
 
 class TvlaService:
     def __init__(
-        self, trace_repository: TraceRepository, range_parameters: RangeParameters
+        self, project_file_reader: ProjectFileReader, range_parameters: RangeParameters
     ):
-        self._trace_repository = trace_repository
+        self._project_file_reader = project_file_reader
         self._range_parameters = range_parameters
         sample_count = range_parameters.sample_count
 
@@ -36,7 +36,7 @@ class TvlaService:
         sample_range = self._range_parameters.trace_sample_range
 
         for batch_range in batch_range_list:
-            batch = self._trace_repository.get_batch(
+            batch = self._project_file_reader.get_batch(
                 batch_range, sample_slice=slice(sample_range.start, sample_range.end)
             )
             traces = batch.traces
