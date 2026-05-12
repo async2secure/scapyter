@@ -34,6 +34,4 @@ class TvlaIncrementalEvaluator:
             # Advance pointer
             self._current_pos = end_val
 
-            print(f"[Stepper] Processed to {end_val} traces | Max T: {score:.4f}")
-
         return results
