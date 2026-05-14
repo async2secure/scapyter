@@ -7,3 +7,4 @@ pytest
 matplotlib
 pandas
 jinja2
+scipy

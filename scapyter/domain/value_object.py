@@ -1,5 +1,5 @@
 import random
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from typing import Iterator
 
@@ -14,6 +14,9 @@ class Batch:
 
     def __len__(self):
         return self.traces.shape[0]
+
+    def copy_with(self, **changes) -> "Batch":
+        return replace(self, **changes)
 
 
 @dataclass(frozen=True)
@@ -34,6 +37,29 @@ class SingleBatch:
     @property
     def key(self):
         return self.metadata.get("key")
+
+    def to_batch(self, **changes) -> Batch:
+        """
+        Converts this single record into a Batch of size N=1.
+        Allows overriding values (like traces) during conversion.
+        """
+        # 1. Prepare the default data (expanding dimensions to 2D)
+        default_indices = range(self.index, self.index + 1)
+        default_traces = self.trace[np.newaxis, :]
+        default_metadata = {
+            k: v[np.newaxis, :] if v.ndim == 1 else v for k, v in self.metadata.items()
+        }
+
+        # 2. Create the Batch instance
+        new_batch = Batch(
+            indices=default_indices, traces=default_traces, metadata=default_metadata
+        )
+
+        # 3. Apply changes if any are provided (Dart-style copyWith)
+        if changes:
+            return new_batch.copy_with(**changes)
+
+        return new_batch
 
 
 @dataclass(frozen=True)
@@ -164,6 +190,14 @@ class Range:
 class RangeParameters:
     trace_range: Range
     trace_sample_range: Range
+
+    @property
+    def trace_count(self) -> int:
+        return self.trace_range.count
+
+    @property
+    def sample_count(self) -> int:
+        return self.trace_sample_range.count
 
 
 class DataSource(Enum):

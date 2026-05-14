@@ -1,11 +1,11 @@
 import os
 import h5py
 
-from scapyter.domain.repository.trace_repository import TraceRepository
+from scapyter.domain.repository.project_file_reader import ProjectFileReader
 from scapyter.domain.value_object import Range, SingleBatch, Batch
 
 
-class H5TraceRepository(TraceRepository):
+class H5ProjectFileReader(ProjectFileReader):
     TAG_ALIASES = {
         "plaintext": ["plaintext", "plain_text"],
         "ciphertext": ["ciphertext", "cipher_text"],
@@ -84,11 +84,11 @@ class H5TraceRepository(TraceRepository):
         )
 
     @property
-    def total_trace_count(self) -> int:
+    def trace_count(self) -> int:
         return self._hf["traces"].shape[0]
 
     @property
-    def total_sample_count(self) -> int:
+    def sample_count(self) -> int:
         return self._hf["traces"].shape[1]
 
     def close(self):
