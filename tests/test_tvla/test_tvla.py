@@ -1,9 +1,9 @@
 import numpy as np
 
-from scapyter.domain.analysis.tvla import TvlaCalculator
-
 
 from scipy import stats
+
+from scapyter.domain.analysis.tvla.calculator import TvlaCalculator
 
 
 def test_compare_with_scipy():

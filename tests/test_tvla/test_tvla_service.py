@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from unittest.mock import MagicMock
 
-from scapyter.domain.analysis.tvla import TvlaService
+from scapyter.domain.analysis.tvla.service import TvlaService
 from scapyter.domain.value_object import Range, RangeParameters
 
 
