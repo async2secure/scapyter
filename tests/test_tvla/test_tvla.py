@@ -1,6 +1,6 @@
 import numpy as np
 
-from scapyter.domain.tvla.tvla_calculator import TvlaCalculator
+from scapyter.domain.analysis.tvla import TvlaCalculator
 
 
 from scipy import stats

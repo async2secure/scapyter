@@ -1,4 +1,4 @@
-from scapyter.domain.tvla.tval_service import TvlaService
+from scapyter.domain.analysis.tvla.service import TvlaService
 from scapyter.domain.value_object import Range
 
 

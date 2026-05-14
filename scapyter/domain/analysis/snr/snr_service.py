@@ -3,11 +3,11 @@ import numpy as np
 from scapyter.domain.leakage.leakage import LeakageModel
 from scapyter.domain.progress_range.progress_range import get_progress_batch
 from scapyter.domain.repository.project_file_reader import ProjectFileReader
-from scapyter.domain.snr.snr import ProgressiveSnr
+from scapyter.domain.analysis.snr.snr import ProgressiveSnr
 from scapyter.domain.value_object import RangeParameters, DataSource
 
 
-class SnrTask:
+class SnrService:
     def __init__(
         self,
         byte_location: int,

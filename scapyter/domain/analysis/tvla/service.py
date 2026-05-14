@@ -2,7 +2,7 @@ import numpy as np
 
 from scapyter.domain.progress_range.progress_range import get_progress_batch
 from scapyter.domain.repository.project_file_reader import ProjectFileReader
-from scapyter.domain.tvla.tvla_calculator import TvlaCalculator
+from scapyter.domain.analysis.tvla.calculator import TvlaCalculator
 from scapyter.domain.value_object import Range, RangeParameters
 
 

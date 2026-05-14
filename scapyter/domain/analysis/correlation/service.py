@@ -1,6 +1,6 @@
 import numpy as np
 
-from scapyter.domain.correlation.correlation import Correlation
+from scapyter.domain.analysis.correlation.correlation import Correlation
 from scapyter.domain.leakage.leakage import LeakageModel
 from scapyter.domain.progress_range.progress_range import get_progress_batch
 from scapyter.domain.repository.project_file_reader import ProjectFileReader
@@ -13,7 +13,7 @@ from scapyter.domain.value_object import (
 )
 
 
-class CorrelationTask:
+class CorrelationService:
     def __init__(
         self,
         byte_location: int,
