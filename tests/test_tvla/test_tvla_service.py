@@ -14,7 +14,7 @@ def mock_repo():
 @pytest.fixture
 def range_params():
     # Setup for 4 traces total, each with 3 samples
-    return RangeParameters(trace_range=Range(0, 4), trace_sample_range=Range(0, 3))
+    return RangeParameters(trace_range=Range(0, 4), sample_range=Range(0, 3))
 
 
 def test_tvla_service_update_accumulates_correctly(mock_repo, range_params):
@@ -66,7 +66,7 @@ def test_tvla_service_empty_range_handling(mock_repo):
 def test_tvla_service_aggregates_even_odd_correctly(mock_repo):
     traces = np.array([[1.0, 1.0], [2.0, 2.0], [3.0, 3.0], [4.0, 4.0]])
 
-    params = RangeParameters(trace_range=Range(0, 4), trace_sample_range=Range(0, 2))
+    params = RangeParameters(trace_range=Range(0, 4), sample_range=Range(0, 2))
     mock_batch = MagicMock()
     mock_batch.traces = traces
     mock_repo.get_batch.return_value = mock_batch
@@ -82,7 +82,7 @@ def test_tvla_service_aggregates_even_odd_correctly(mock_repo):
 
 def test_tvla_service_incremental_updates(mock_repo):
     """Verifies that multiple calls to update() correctly accumulate state."""
-    params = RangeParameters(trace_range=Range(0, 4), trace_sample_range=Range(0, 1))
+    params = RangeParameters(trace_range=Range(0, 4), sample_range=Range(0, 1))
 
     # First update: 2 traces
     batch_1 = MagicMock(traces=np.array([[1.0], [2.0]]))
@@ -109,7 +109,7 @@ def test_tvla_service_incremental_updates(mock_repo):
 
 
 def test_tvla_service_with_odd_batch_size(mock_repo):
-    params = RangeParameters(trace_range=Range(0, 6), trace_sample_range=Range(0, 1))
+    params = RangeParameters(trace_range=Range(0, 6), sample_range=Range(0, 1))
 
     batch_1_traces = np.array([[0.0], [1.0], [2.0]])
     batch_2_traces = np.array([[3.0], [4.0], [5.0]])

@@ -189,7 +189,7 @@ class Range:
 @dataclass(frozen=True)
 class RangeParameters:
     trace_range: Range
-    trace_sample_range: Range
+    sample_range: Range
 
     @property
     def trace_count(self) -> int:
@@ -197,7 +197,7 @@ class RangeParameters:
 
     @property
     def sample_count(self) -> int:
-        return self.trace_sample_range.count
+        return self.sample_range.count
 
 
 class DataSource(Enum):

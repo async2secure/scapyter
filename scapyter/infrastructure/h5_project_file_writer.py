@@ -1,6 +1,6 @@
 import h5py
 
-from domain.value_object import Batch
+from scapyter. domain.value_object import Batch
 
 
 class H5ProjectFileWriter:

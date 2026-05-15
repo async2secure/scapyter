@@ -36,7 +36,7 @@ class SnrService:
         )
 
         for batch_range in batch_range_list:
-            sample_range = self._range_parameters.trace_sample_range
+            sample_range = self._range_parameters.sample_range
 
             batch = self._project_file_reader.get_batch(
                 batch_range, sample_slice=slice(sample_range.start, sample_range.end)
