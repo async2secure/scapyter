@@ -28,8 +28,9 @@ def test_compute_fft_magnitudes_with_hamming_window():
         window_type=WindowFunctionType.HAMMING,
     )
 
-    spectrum = rfft(traces, axis=-1) / sampling_count
-    spectrum *= np.hamming(spectrum.shape[-1])
+    windowed = traces * np.hamming(sampling_count)
+
+    spectrum = rfft(windowed, axis=-1) / sampling_count
 
     expected = np.abs(spectrum).astype(np.float64)
 
@@ -46,8 +47,9 @@ def test_compute_fft_magnitudes_with_hanning_window():
         window_type=WindowFunctionType.HANNING,
     )
 
-    spectrum = rfft(traces, axis=-1) / sampling_count
-    spectrum *= np.hanning(spectrum.shape[-1])
+    windowed = traces * np.hanning(sampling_count)
+
+    spectrum = rfft(windowed, axis=-1) / sampling_count
 
     expected = np.abs(spectrum).astype(np.float64)
 

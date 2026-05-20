@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.fft import rfft
+import pyfftw.interfaces.scipy_fft as fft
 
 from scapyter.domain.signal_processing.fft.window_type import WindowFunctionType
 
@@ -7,14 +7,15 @@ from scapyter.domain.signal_processing.fft.window_type import WindowFunctionType
 def compute_fft_magnitudes(
     traces: np.ndarray, sampling_count: int, window_type: WindowFunctionType = None
 ) -> np.ndarray:
-    # 1. Transform to Frequency Domain
-    spectrum = rfft(traces, axis=-1) / sampling_count
-
-    # 2. Apply Windowing Strategy
     if window_type == WindowFunctionType.HAMMING:
-        spectrum *= np.hamming(spectrum.shape[-1])
+        traces = traces * np.hamming(sampling_count)
     elif window_type == WindowFunctionType.HANNING:
-        spectrum *= np.hanning(spectrum.shape[-1])
+        traces = traces * np.hanning(sampling_count)
 
-    # 3. Return Absolute Magnitude (Real numbers for downstream analysis)
+    # rfft output shape: (batch_size, sampling_count // 2 + 1)
+    spectrum = fft.rfft(
+        traces,
+        axis=-1,
+    )
+
     return np.abs(spectrum).astype(np.float64)
