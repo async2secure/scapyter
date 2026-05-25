@@ -1,6 +1,6 @@
 import h5py
 
-from domain.value_object import Batch
+from scapyter.domain.value_object import Batch
 
 
 class H5ProjectFileWriter:
@@ -10,11 +10,11 @@ class H5ProjectFileWriter:
         self._batch_cursor = 0
 
     def save_batch(self, batch: Batch):
+
         with h5py.File(self.file_path, "a") as hf:
             # 1. Handle Traces
             if "traces" not in hf:
                 sample_count = batch.traces.shape[1]
-                # chunk_shape = (self.total_traces, 1000)
                 hf.create_dataset(
                     "traces",
                     (self.total_traces, sample_count),

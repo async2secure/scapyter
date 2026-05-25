@@ -86,9 +86,6 @@ class _GroupedStreamingStats:
         return self._m2s[key] / count
 
 
-# ---------------------------------
-# DROP-IN REPLACEMENT
-# ---------------------------------
 class ProgressiveSnr:
     """
     Streaming + vectorized hybrid implementation.

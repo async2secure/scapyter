@@ -2,7 +2,7 @@ from typing import Optional
 import numpy as np
 from numba import jit
 
-from scapyter.domain.correlation.correlation import Correlation
+from scapyter.domain.analysis.correlation.correlation import Correlation
 from scapyter.domain.value_object import TraceAndModeledLeakage
 
 
