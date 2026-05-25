@@ -43,23 +43,27 @@ class KeyRankVisualizer:
 
         return bytes(key)
 
-    def display_rank_table(self, top_n: int = 5):
+    def get_rank_table(self, top_n: int = 5) -> pd.DataFrame:
         """
-        Displays ranking table using actual key values.
+        Generates and returns the ranking table as a pandas DataFrame.
+        Use this if you want to programmatically manipulate the data.
         """
         data = {}
-
         for r in self.results:
             candidates = self._get_top_candidates(
                 r.corr_matrix, r.key_candidates, top_n
             )
-
             data[f"Byte {r.byte_index:02d}"] = [
                 f"{val:02X} ({score:.3f})" for val, score in candidates
             ]
 
         df = pd.DataFrame(data)
         df.index = [f"Rank {i + 1}" for i in range(top_n)]
-
-        display(df)
         return df
+
+    def display_rank_table(self, top_n: int = 5) -> None:
+        """
+        Displays the ranking table directly in the Jupyter notebook.
+        """
+        df = self.get_rank_table(top_n=top_n)
+        display(df)
