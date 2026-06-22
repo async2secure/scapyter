@@ -1,6 +1,11 @@
 import numpy as np
 
-from scapyter.domain.analysis.correlation.value_objects import CorrelationFunction
+from scapyter.domain.analysis.correlation.trace_statistics_accumulator import (
+    TraceStatisticsAccumulator,
+)
+from scapyter.domain.analysis.correlation.value_objects.correlation_functions import (
+    CorrelationFunction,
+)
 from scapyter.domain.progress_range.progress_range import get_progress_batch
 from scapyter.domain.repository.project_file_reader import ProjectFileReader
 from scapyter.domain.value_object import (
@@ -23,6 +28,7 @@ class CorrelationService:
         self._range_parameters = range_parameters
         self._data_source = data_source
         self._correlation_functions = correlation_functions
+        self._trace_statics_accumulator = TraceStatisticsAccumulator()
 
     def run(self, batch_size=50) -> list[CpaByteResult]:
         trace_range = self._range_parameters.trace_range
@@ -58,14 +64,14 @@ class CorrelationService:
                     traces=batch.traces,
                     modeled_leakage=np.asarray(modeled_leakages).T,
                 )
-
+                self._trace_statics_accumulator.update(batch.traces)
                 func.correlation.update(trace_and_modeled_leakage)
-
+        statics = self._trace_statics_accumulator.compute()
         return [
             CpaByteResult(
                 func.byte_location,
                 func.key_byte_guesses,
-                func.correlation.compute(),
+                func.correlation.compute(statics),
             )
             for func in self._correlation_functions
         ]
