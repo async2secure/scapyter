@@ -12,14 +12,14 @@ class TraceStatisticsAccumulator:
         self.processed_traces = 0
 
     def update(self, traces):
-        batch_sum = traces.sum(axis=0)
+        batch_sum = traces.sum(axis=0, dtype=np.float64)
 
         if self.trace_sum is None:
             self.trace_sum = batch_sum
-            self.acc_x2 = np.square(traces).sum(axis=0)
+            self.acc_x2 = np.square(traces, dtype=np.float64).sum(axis=0)
         else:
             self.trace_sum += batch_sum
-            self.acc_x2 += np.square(traces).sum(axis=0)
+            self.acc_x2 += np.square(traces, dtype=np.float64).sum(axis=0)
 
         self.processed_traces += traces.shape[0]
 

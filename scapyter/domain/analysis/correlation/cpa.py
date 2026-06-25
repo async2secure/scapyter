@@ -38,17 +38,13 @@ class CpaCorrelation(Correlation):
         variance = trace_statistics.variance
         n = trace_statistics.processed_traces
 
-        inv_n = 1.0 / n
+        numerator = (self._accXM / n) - np.outer(self._accM / n, mean)
+        denominator_inner = self._accM2 / n - (self._accM / n) ** 2
+        denominator = np.sqrt(np.outer(denominator_inner, variance))
 
-        m = self._accM * inv_n
-        xm = self._accXM * inv_n
+        # Handling divide-by-zero
+        mask = variance == 0.0
+        numerator[:, mask] = 0.0
+        denominator[:, mask] = 1.0
 
-        numerator = xm - m[:, None] * mean[None, :]
-        denom_left = self._accM2 * inv_n - m**2
-
-        denom_left = np.maximum(denom_left, 1e-12)
-        variance = np.maximum(variance, 1e-12)
-
-        denominator = np.sqrt(denom_left[:, None] * variance[None, :])
-
-        return numerator / denominator
+        return np.nan_to_num(numerator / denominator)

@@ -40,12 +40,10 @@ class H5VirtualDatasetBuilder:
                 with h5py.File(file_path, "r") as src:
                     n_traces = src["traces"].shape[0]
 
-                traces_layout[offset : offset + n_traces] = (
-                    h5py.VirtualSource(
-                        file_path,
-                        "traces",
-                        shape=(n_traces, sample_count),
-                    )
+                traces_layout[offset : offset + n_traces] = h5py.VirtualSource(
+                    file_path,
+                    "traces",
+                    shape=(n_traces, sample_count),
                 )
 
                 offset += n_traces
@@ -68,12 +66,10 @@ class H5VirtualDatasetBuilder:
                         ds = src[f"metadata/{meta_name}"]
                         n_traces = ds.shape[0]
 
-                    layout[offset : offset + n_traces] = (
-                        h5py.VirtualSource(
-                            file_path,
-                            f"metadata/{meta_name}",
-                            shape=(n_traces, *tail_shape),
-                        )
+                    layout[offset : offset + n_traces] = h5py.VirtualSource(
+                        file_path,
+                        f"metadata/{meta_name}",
+                        shape=(n_traces, *tail_shape),
                     )
 
                     offset += n_traces
@@ -107,9 +103,7 @@ class H5VirtualDatasetBuilder:
         for file_path in self.source_files[1:]:
             with h5py.File(file_path, "r") as f:
                 if f["traces"].shape[1] != reference_sample_count:
-                    raise ValueError(
-                        f"{file_path}: sample count mismatch."
-                    )
+                    raise ValueError(f"{file_path}: sample count mismatch.")
 
                 current_metadata = {
                     name: (
@@ -120,6 +114,4 @@ class H5VirtualDatasetBuilder:
                 }
 
                 if current_metadata != reference_metadata:
-                    raise ValueError(
-                        f"{file_path}: metadata structure mismatch."
-                    )
+                    raise ValueError(f"{file_path}: metadata structure mismatch.")
