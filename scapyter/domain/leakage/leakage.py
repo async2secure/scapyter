@@ -35,3 +35,23 @@ class SboxOutputLeakageModel(LeakageModel):
         state = plaintext_byte ^ key_guess
         intermediate_values = SBOX[state]
         return HW[intermediate_values]
+
+
+class SboxInputOutputHammingDistanceLeakageModel(LeakageModel):
+
+    def calculate(
+        self, known_data: np.ndarray, byte_location: int, key_guess: int
+    ) -> np.ndarray:
+        plaintext_byte = known_data[:, byte_location]
+
+        # PT ^ K
+        state = plaintext_byte ^ key_guess
+
+        # SBOX(PT ^ K)
+        sbox_out = SBOX[state]
+
+        # (PT ^ K) ^ SBOX(PT ^ K)
+        intermediate = state ^ sbox_out
+
+        # Hamming Weight leakage
+        return HW[intermediate]
