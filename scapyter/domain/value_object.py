@@ -42,6 +42,12 @@ class SingleBatch:
     def key(self):
         return self.metadata.get("key")
 
+    def with_metadata(self, **metadata: np.ndarray) -> "SingleBatch":
+        return replace(
+            self,
+            metadata={**self.metadata, **metadata},
+        )
+
     def to_batch(self, **changes) -> Batch:
         """
         Converts this single record into a Batch of size N=1.

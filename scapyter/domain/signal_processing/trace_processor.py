@@ -11,3 +11,6 @@ class TraceProcessor(ABC):
     @abstractmethod
     def process(self, batch: Batch) -> Batch:
         pass
+
+    def output_shape(self, input_shape):
+        return input_shape

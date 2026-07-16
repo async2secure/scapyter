@@ -47,6 +47,7 @@ class SnrService:
                 byte_location=self._byte_location,
                 known_data=known_data,
                 key_guess=self._known_key_byte,
+                meta=batch.metadata,
             )
 
             self._snr.update(traces=batch.traces, hex_array=np.asarray(modeled_leakage))
