@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 from scapyter.domain.leakage.leakage import LeakageModel
 from scapyter.domain.progress_range.progress_range import get_progress_batch
@@ -35,7 +36,7 @@ class SnrService:
             trace_range=trace_range,
         )
 
-        for batch_range in batch_range_list:
+        for batch_range in tqdm(batch_range_list, desc="SNR"):
             sample_range = self._range_parameters.sample_range
 
             batch = self._project_file_reader.get_batch(
