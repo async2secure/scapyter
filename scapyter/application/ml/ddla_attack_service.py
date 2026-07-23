@@ -1,8 +1,9 @@
 # application/ddla_attack.py
+from tqdm import tqdm
 
 from scapyter.domain.leakage.leakage import LeakageModel
 from scapyter.domain.ml.distinguishers import NonProfiledDistinguisher
-from scapyter.domain.ml.value_objects import TrainingResult, AttackMetric, AttackResult
+from scapyter.domain.ml.value_objects import AttackMetric, AttackResult
 from scapyter.domain.repository.project_file_reader import ProjectFileReader
 from scapyter.domain.value_object import DataSource, Range
 from scapyter.infrastructure.ml.stream_dataset import StreamDataset
@@ -23,13 +24,17 @@ class DDLAAttackService:
         self._data_source = data_source
 
     def run(
-        self, byte_location: int, trace_range: Range, sample_range: Range
+        self,
+        byte_location: int,
+        trace_range: Range,
+        sample_range: Range,
+        split_percentage: float = 0.7,
     ) -> AttackResult:
         results = []
 
         all_indices = list(range(trace_range.start, trace_range.end))
 
-        split = int(len(all_indices) * 0.8)
+        split = int(len(all_indices) * split_percentage)
 
         train_indices = all_indices[:split]
         validation_indices = all_indices[split:]
@@ -48,7 +53,10 @@ class DDLAAttackService:
             sample_range=sample_range,
         )
 
-        for key_guess in range(256):
+        for key_guess in tqdm(
+            range(256),
+            desc=f"DDLA byte {byte_location}",
+        ):
             training = self.distinguisher.evaluate(
                 train_dataset,
                 validation_dataset=validation_dataset,

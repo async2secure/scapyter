@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Callable
 
 import torch
+from torch import nn
 from torch.utils.data import DataLoader
 
 from .hypothetical_label_dataset import HypotheticalLabelDataset
@@ -32,12 +33,16 @@ class PyTorchDdlaAdapter(NonProfiledDistinguisher):
         self,
         trainer: PyTorchTrainer,
         model_factory: Callable[[], torch.nn.Module],
+        criterion_factory: Callable[[], nn.Module],
+        optimizer_factory: Callable[[nn.Module], torch.optim.Optimizer],
         *,
         batch_size: int = 256,
         device: str | None = None,
     ) -> None:
         self._trainer = trainer
         self._model_factory = model_factory
+        self._criterion_factory = criterion_factory
+        self._optimizer_factory = optimizer_factory
         self._batch_size = batch_size
 
         if device is None:
@@ -86,9 +91,14 @@ class PyTorchDdlaAdapter(NonProfiledDistinguisher):
             )
 
         model = self._model_factory()
+        criterion = self._criterion_factory()
+
+        optimizer = self._optimizer_factory(model)
         return self._trainer.fit(
             model=model,
             train_loader=train_loader,
             validation_loader=validation_loader,
             device=self._device,
+            optimizer=optimizer,
+            criterion=criterion,
         )

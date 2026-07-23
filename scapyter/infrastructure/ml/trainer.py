@@ -20,30 +20,32 @@ class PyTorchTrainer:
     def __init__(
         self,
         epochs: int = 10,
-        lr: float = 1e-3,
-        weight_decay: float = 0.0,
+        # lr: float = 1e-3,
+        # weight_decay: float = 0.0,
     ):
         self.epochs = epochs
-        self.lr = lr
-        self.weight_decay = weight_decay
+        # self.lr = lr
+        # self.weight_decay = weight_decay
 
     def fit(
         self,
         model: nn.Module,
         train_loader: DataLoader,
         device: torch.device,
+        criterion: nn.Module,
+        optimizer: torch.optim.Optimizer,
         validation_loader: DataLoader | None = None,
     ) -> TrainingResult:
 
         model = model.to(device)
 
-        criterion = nn.CrossEntropyLoss()
-
-        optimizer = torch.optim.Adam(
-            model.parameters(),
-            lr=self.lr,
-            weight_decay=self.weight_decay,
-        )
+        # criterion = nn.CrossEntropyLoss()
+        #
+        # optimizer = torch.optim.Adam(
+        #     model.parameters(),
+        #     lr=self.lr,
+        #     weight_decay=self.weight_decay,
+        # )
 
         history: list[EpochMetrics] = []
 
