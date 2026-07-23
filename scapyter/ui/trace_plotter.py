@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from scapyter.domain.value_object import Range
+
 
 class TracePlotter:
     def __init__(self, repository):
@@ -9,12 +11,12 @@ class TracePlotter:
         """
         self.repo = repository
 
-    def plot_single(self, index, sample_range=slice(None), color="blue"):
+    def plot_single(self, index, sample_range: Range | None = None, color="blue"):
         """Plots a single trace from the repository."""
-        trace = self.repo.get_single_batch(index, sample_slice=sample_range)
+        trace = self.repo.get_single_batch(index, sample_range=sample_range)
 
         plt.figure(figsize=(12, 4))
-        plt.plot(trace.trace, color=color, linewidth=0.7)
+        plt.plot(trace.traces[0], color=color, linewidth=0.7)
         plt.title(f"Trace {index}")
         plt.xlabel("Sample Index")
         plt.ylabel("Amplitude")
@@ -22,9 +24,9 @@ class TracePlotter:
         plt.tight_layout()
         plt.show()
 
-    def plot_overlay(self, trace_range, sample_range=slice(None), alpha=0.5):
+    def plot_overlay(self, trace_range, sample_range: Range | None = None, alpha=0.5):
         """Overlays multiple traces to check for alignment or noise."""
-        batch = self.repo.get_batch(trace_range, sample_slice=sample_range)
+        batch = self.repo.get_batch(trace_range, sample_range=sample_range)
 
         plt.figure(figsize=(12, 5))
         for i in range(len(batch.trace)):
