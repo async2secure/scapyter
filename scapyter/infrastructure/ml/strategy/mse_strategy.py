@@ -2,7 +2,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from infrastructure.ml.strategy.loss_strategy import LossStrategy
+from scapyter.infrastructure.ml.strategy.loss_strategy import LossStrategy
 
 
 class MSEStrategy(LossStrategy):

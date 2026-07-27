@@ -1,9 +1,9 @@
 import torch
 from torch.utils.data import Dataset
 
-from infrastructure.ml.strategy.loss_strategy import LossStrategy
 from scapyter.domain.leakage.leakage import LeakageModel
 from scapyter.domain.value_object import DataSource
+from scapyter.infrastructure.ml.strategy.loss_strategy import LossStrategy
 from scapyter.infrastructure.ml.stream_dataset import StreamDataset
 
 

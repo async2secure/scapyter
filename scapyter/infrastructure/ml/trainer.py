@@ -2,8 +2,9 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
-from infrastructure.ml.strategy.loss_strategy import LossStrategy
+# from infrastructure.ml.strategy.loss_strategy import LossStrategy
 from scapyter.domain.ml.value_objects import TrainingResult, EpochMetrics
+from scapyter.infrastructure.ml.strategy.loss_strategy import LossStrategy
 
 
 class PyTorchTrainer:
