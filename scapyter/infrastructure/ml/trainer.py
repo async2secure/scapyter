@@ -2,6 +2,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
+from infrastructure.ml.strategy.loss_strategy import LossStrategy
 from scapyter.domain.ml.value_objects import TrainingResult, EpochMetrics
 
 
@@ -20,32 +21,20 @@ class PyTorchTrainer:
     def __init__(
         self,
         epochs: int = 10,
-        # lr: float = 1e-3,
-        # weight_decay: float = 0.0,
     ):
         self.epochs = epochs
-        # self.lr = lr
-        # self.weight_decay = weight_decay
 
     def fit(
         self,
         model: nn.Module,
         train_loader: DataLoader,
         device: torch.device,
-        criterion: nn.Module,
         optimizer: torch.optim.Optimizer,
+        loss_strategy: LossStrategy,
         validation_loader: DataLoader | None = None,
     ) -> TrainingResult:
 
         model = model.to(device)
-
-        # criterion = nn.CrossEntropyLoss()
-        #
-        # optimizer = torch.optim.Adam(
-        #     model.parameters(),
-        #     lr=self.lr,
-        #     weight_decay=self.weight_decay,
-        # )
 
         history: list[EpochMetrics] = []
 
@@ -54,9 +43,9 @@ class PyTorchTrainer:
             train_loss, train_accuracy = self._train_epoch(
                 model=model,
                 loader=train_loader,
-                criterion=criterion,
                 optimizer=optimizer,
                 device=device,
+                loss_strategy=loss_strategy,
             )
 
             validation_loss = None
@@ -66,7 +55,7 @@ class PyTorchTrainer:
                 validation_loss, validation_accuracy = self._validate(
                     model=model,
                     loader=validation_loader,
-                    criterion=criterion,
+                    loss_strategy=loss_strategy,
                     device=device,
                 )
 
@@ -86,7 +75,7 @@ class PyTorchTrainer:
     def _train_epoch(
         model: nn.Module,
         loader: DataLoader,
-        criterion: nn.Module,
+        loss_strategy: LossStrategy,
         optimizer: torch.optim.Optimizer,
         device: torch.device,
     ) -> tuple[float, float]:
@@ -106,7 +95,10 @@ class PyTorchTrainer:
 
             logits = model(x)
 
-            loss = criterion(logits, y)
+            loss = loss_strategy.loss(
+                logits,
+                y,
+            )
 
             loss.backward()
 
@@ -114,10 +106,13 @@ class PyTorchTrainer:
 
             total_loss += loss.item()
 
-            predictions = logits.argmax(dim=1)
+            predictions = loss_strategy.predictions(logits)
 
-            correct += (predictions == y).sum().item()
-            total += y.size(0)
+            targets = loss_strategy.decode_targets(y)
+
+            correct += (predictions == targets).sum().item()
+
+            total += targets.size(0)
 
         average_loss = total_loss / len(loader)
         accuracy = correct / total
@@ -129,7 +124,7 @@ class PyTorchTrainer:
         self,
         model: nn.Module,
         loader: DataLoader,
-        criterion: nn.Module,
+        loss_strategy: LossStrategy,
         device: torch.device,
     ) -> tuple[float, float]:
 
@@ -146,14 +141,20 @@ class PyTorchTrainer:
 
             logits = model(x)
 
-            loss = criterion(logits, y)
+            loss = loss_strategy.loss(
+                logits,
+                y,
+            )
 
             total_loss += loss.item()
 
-            predictions = logits.argmax(dim=1)
+            predictions = loss_strategy.predictions(logits)
 
-            correct += (predictions == y).sum().item()
-            total += y.size(0)
+            targets = loss_strategy.decode_targets(y)
+
+            correct += (predictions == targets).sum().item()
+
+            total += targets.size(0)
 
         average_loss = total_loss / len(loader)
         accuracy = correct / total

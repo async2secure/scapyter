@@ -9,6 +9,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from .hypothetical_label_dataset import HypotheticalLabelDataset
+from .strategy.loss_strategy import LossStrategy
 from .stream_dataset import StreamDataset
 from .trainer import PyTorchTrainer
 from ...domain.leakage.leakage import LeakageModel
@@ -33,7 +34,7 @@ class PyTorchDdlaAdapter(NonProfiledDistinguisher):
         self,
         trainer: PyTorchTrainer,
         model_factory: Callable[[], torch.nn.Module],
-        criterion_factory: Callable[[], nn.Module],
+        loss_strategy: LossStrategy,
         optimizer_factory: Callable[[nn.Module], torch.optim.Optimizer],
         *,
         batch_size: int = 256,
@@ -41,7 +42,7 @@ class PyTorchDdlaAdapter(NonProfiledDistinguisher):
     ) -> None:
         self._trainer = trainer
         self._model_factory = model_factory
-        self._criterion_factory = criterion_factory
+        self._loss_strategy = loss_strategy
         self._optimizer_factory = optimizer_factory
         self._batch_size = batch_size
 
@@ -59,12 +60,17 @@ class PyTorchDdlaAdapter(NonProfiledDistinguisher):
         key_guess: int,
         data_source: DataSource,
     ) -> TrainingResult:
+
+        num_classes: int = self._model_factory().num_classes()
+
         train_label_dataset = HypotheticalLabelDataset(
             base_dataset=train_dataset,
             leakage_model=leakage_model,
             key_guess=key_guess,
             byte_location=byte_location,
             data_source=data_source,
+            num_classes=num_classes,
+            loss_strategy=self._loss_strategy,
         )
 
         train_loader = DataLoader(
@@ -82,6 +88,8 @@ class PyTorchDdlaAdapter(NonProfiledDistinguisher):
                 key_guess=key_guess,
                 byte_location=byte_location,
                 data_source=data_source,
+                loss_strategy=self._loss_strategy,
+                num_classes=num_classes,
             )
 
             validation_loader = DataLoader(
@@ -91,7 +99,6 @@ class PyTorchDdlaAdapter(NonProfiledDistinguisher):
             )
 
         model = self._model_factory()
-        criterion = self._criterion_factory()
 
         optimizer = self._optimizer_factory(model)
         return self._trainer.fit(
@@ -100,5 +107,5 @@ class PyTorchDdlaAdapter(NonProfiledDistinguisher):
             validation_loader=validation_loader,
             device=self._device,
             optimizer=optimizer,
-            criterion=criterion,
+            loss_strategy=self._loss_strategy,
         )
