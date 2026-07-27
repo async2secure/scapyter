@@ -48,6 +48,7 @@ class HypotheticalLabelDataset(Dataset):
             key_guess=self._key_guess,
             byte_location=self._byte_location,
         )
+        raw_label = torch.as_tensor(raw_label).item()
 
         label = self._loss_strategy.encode_target(
             raw_label,
