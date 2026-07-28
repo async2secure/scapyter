@@ -83,6 +83,9 @@ class KeyByteGuesses:
     def __iter__(self) -> Iterator[int]:
         return iter(self.values)
 
+    def __len__(self) -> int:
+        return len(self.values)
+
 
 @dataclass(frozen=True)
 class TraceAndModeledLeakage:

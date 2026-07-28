@@ -7,7 +7,7 @@ from scapyter.application.ml.preprocessing.preprocessing_project_file_reader imp
 from scapyter.domain.leakage.leakage import LeakageModel
 from scapyter.domain.ml.distinguishers import NonProfiledDistinguisher
 from scapyter.domain.ml.value_objects import AttackMetric, AttackResult
-from scapyter.domain.value_object import DataSource, Range
+from scapyter.domain.value_object import DataSource, Range, KeyByteGuesses
 from scapyter.infrastructure.ml.stream_dataset import StreamDataset
 
 
@@ -31,6 +31,7 @@ class DDLAAttackService:
         trace_range: Range,
         sample_range: Range,
         split_percentage: float = 0.7,
+        key_byte_guesses: KeyByteGuesses | None = KeyByteGuesses.from_full256_range(),
     ) -> AttackResult:
         results = []
 
@@ -64,7 +65,7 @@ class DDLAAttackService:
         )
 
         for key_guess in tqdm(
-            range(256),
+            key_byte_guesses,
             desc=f"DDLA byte {byte_location}",
         ):
             training = self.distinguisher.evaluate(

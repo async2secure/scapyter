@@ -1,6 +1,6 @@
 import numpy as np
 
-from scapyter.application.processsing.trace_transformer import TraceTransformer
+from scapyter.application.ml.preprocessing.trace_transformer import TraceTransformer
 
 
 class TraceProcessingPipeline:
@@ -9,8 +9,7 @@ class TraceProcessingPipeline:
 
     def fit(self, traces: np.ndarray):
         for transformer in self._transformers:
-            if hasattr(transformer, "fit"):
-                transformer.fit(traces)
+            transformer.fit(traces)
             traces = transformer.transform(traces)
 
     def transform(self, traces: np.ndarray) -> np.ndarray:
