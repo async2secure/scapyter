@@ -1,10 +1,12 @@
 # application/ddla_attack.py
 from tqdm import tqdm
 
+from scapyter.application.ml.preprocessing.preprocessing_project_file_reader import (
+    ProcessedProjectFileReader,
+)
 from scapyter.domain.leakage.leakage import LeakageModel
 from scapyter.domain.ml.distinguishers import NonProfiledDistinguisher
 from scapyter.domain.ml.value_objects import AttackMetric, AttackResult
-from scapyter.domain.repository.project_file_reader import ProjectFileReader
 from scapyter.domain.value_object import DataSource, Range
 from scapyter.infrastructure.ml.stream_dataset import StreamDataset
 
@@ -16,7 +18,7 @@ class DDLAAttackService:
         distinguisher: NonProfiledDistinguisher,
         leakage_model: LeakageModel,
         data_source: DataSource,
-        project_file_reader: ProjectFileReader,
+        project_file_reader: ProcessedProjectFileReader,
     ):
         self.distinguisher = distinguisher
         self._leakage_model = leakage_model
@@ -38,6 +40,14 @@ class DDLAAttackService:
 
         train_indices = all_indices[:split]
         validation_indices = all_indices[split:]
+
+        self._project_file_reader.fit(
+            trace_range=Range(
+                train_indices[0],
+                train_indices[-1] + 1,
+            ),
+            sample_range=sample_range,
+        )
 
         train_dataset = StreamDataset(
             repo=self._project_file_reader,
@@ -74,6 +84,6 @@ class DDLAAttackService:
             )
 
         # 3. rank keys (application logic)
-        results.sort(key=lambda x: x.loss)
+        results.sort(key=lambda x: x.accuracy, reverse=True)
 
         return AttackResult(results)

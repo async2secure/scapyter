@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Sequence
 
 import numpy as np
 
@@ -9,9 +10,6 @@ class TraceDataset:
     known_values: np.ndarray
 
 
-from dataclasses import dataclass
-
-
 @dataclass(frozen=True)
 class EpochMetrics:
     epoch: int
@@ -19,10 +17,6 @@ class EpochMetrics:
     train_accuracy: float
     validation_loss: float | None = None
     validation_accuracy: float | None = None
-
-
-from dataclasses import dataclass
-from collections.abc import Sequence
 
 
 @dataclass(frozen=True)
@@ -58,6 +52,10 @@ class AttackMetric:
     @property
     def loss(self):
         return self.training.loss
+
+    @property
+    def accuracy(self):
+        return self.training.accuracy
 
 
 @dataclass(frozen=True)

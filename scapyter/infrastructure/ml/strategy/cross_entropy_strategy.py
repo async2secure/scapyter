@@ -3,7 +3,7 @@ from __future__ import annotations
 import torch
 from torch import nn
 
-from infrastructure.ml.strategy.loss_strategy import LossStrategy
+from scapyter.infrastructure.ml.strategy.loss_strategy import LossStrategy
 
 
 class CrossEntropyStrategy(LossStrategy):
