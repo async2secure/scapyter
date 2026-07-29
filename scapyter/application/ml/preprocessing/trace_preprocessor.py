@@ -3,10 +3,13 @@ from typing import Protocol
 import numpy as np
 
 
-class TraceTransformer(Protocol):
+class TracePreprocessor(Protocol):
 
-    def fit(self, traces: np.ndarray) -> None:
+    def partial_fit(self, traces: np.ndarray):
         raise NotImplementedError
 
     def transform(self, traces: np.ndarray) -> np.ndarray:
+        raise NotImplementedError
+
+    def finalize(self):
         raise NotImplementedError

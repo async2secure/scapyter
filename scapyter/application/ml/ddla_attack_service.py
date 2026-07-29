@@ -42,7 +42,7 @@ class DDLAAttackService:
         train_indices = all_indices[:split]
         validation_indices = all_indices[split:]
 
-        self._project_file_reader.fit(
+        self._project_file_reader.fit_processing(
             trace_range=Range(
                 train_indices[0],
                 train_indices[-1] + 1,
