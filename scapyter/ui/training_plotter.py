@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import matplotlib.pyplot as plt
 
-from scapyter.domain.ml.value_objects import TrainingResult
+from scapyter.domain.ml.value_objects import TrainingResult, AttackResult
 
 
 class TrainingPlotter:
@@ -74,4 +74,25 @@ class TrainingPlotter:
         axes[1].legend()
 
         plt.tight_layout()
+        plt.show()
+
+    @staticmethod
+    def plot_attack_accuracy(
+        attack: AttackResult,
+        *,
+        figsize: tuple[int, int] = (10, 4),
+    ) -> None:
+
+        key_guesses = [m.key_guess for m in attack.metrics]
+        accuracies = [m.accuracy for m in attack.metrics]
+
+        plt.figure(figsize=figsize)
+
+        plt.scatter(key_guesses, accuracies, marker="x", color="red")
+
+        plt.xlabel("Key guess")
+        plt.ylabel("Validation accuracy")
+        plt.title("Validation Accuracy vs Key Guess")
+        plt.grid(True)
+
         plt.show()
