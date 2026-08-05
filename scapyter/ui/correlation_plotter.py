@@ -41,7 +41,7 @@ class CorrelationPlotter:
         plt.plot(
             x_axis,
             highest_envelope,
-            color="red",
+            color="yellow",
             label="Max Envelope",
             linewidth=1,
             alpha=0.7,
@@ -50,7 +50,7 @@ class CorrelationPlotter:
         plt.plot(
             x_axis,
             lowest_envelope,
-            color="black",
+            color="blue",
             label="Min Envelope",
             linewidth=1,
             alpha=0.7,
@@ -60,7 +60,7 @@ class CorrelationPlotter:
         plt.plot(
             x_axis,
             corr_matrix[best_idx],
-            color="blue",
+            color="red",
             linestyle="--",
             label=f"Best Candidate ({best_key_value:02X})",
             linewidth=1.5,

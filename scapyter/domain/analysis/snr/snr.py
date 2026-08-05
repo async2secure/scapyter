@@ -22,38 +22,38 @@ class _GroupedStreamingStats:
         if len(traces) == 0:
             return
 
-        # -----------------------------
-        # Vectorized grouping (within chunk)
-        # -----------------------------
-        keys, inverse = np.unique(labels, return_inverse=True)
-        n_groups = len(keys)
+        # Sort by label so each group's traces are contiguous
+        order = np.argsort(labels)
+        labels = labels[order]
+        traces = traces[order]
 
-        counts = np.bincount(inverse)
+        # Find group boundaries
+        keys, idx, counts = np.unique(
+            labels,
+            return_index=True,
+            return_counts=True,
+        )
 
-        sums = np.zeros((n_groups, self._trace_dim), dtype=np.float64)
-        np.add.at(sums, inverse, traces)
-
+        # Sum each group
+        sums = np.add.reduceat(traces, idx)
         means = sums / counts[:, None]
 
-        # Compute M2 (within chunk)
-        centered = traces - means[inverse]
-        sq = centered**2
+        # Repeat each group's index for every trace in that group
+        group_ids = np.repeat(np.arange(len(keys)), counts)
 
-        m2s = np.zeros((n_groups, self._trace_dim), dtype=np.float64)
-        np.add.at(m2s, inverse, sq)
+        # Compute squared deviations from the group mean
+        centered = traces - means[group_ids]
+        sq = centered * centered
 
-        # -----------------------------
-        # Merge into global stats
-        # -----------------------------
-        for i, key in enumerate(keys):
+        # Sum squared deviations (M2) for each group
+        m2s = np.add.reduceat(sq, idx)
+
+        # Merge into global statistics
+        for key, c2, m2, s2 in zip(keys, counts, means, m2s):
             key = int(key)
 
-            c2 = counts[i]
-            m2 = means[i]
-            s2 = m2s[i]
-
             if key not in self._counts:
-                self._counts[key] = c2
+                self._counts[key] = int(c2)
                 self._means[key] = m2
                 self._m2s[key] = s2
             else:
@@ -65,7 +65,11 @@ class _GroupedStreamingStats:
                 total = c1 + c2
 
                 self._means[key] = m1 + delta * (c2 / total)
-                self._m2s[key] = s1 + s2 + (delta**2) * (c1 * c2 / total)
+                self._m2s[key] = (
+                        s1
+                        + s2
+                        + delta * delta * (c1 * c2 / total)
+                )
                 self._counts[key] = total
 
     # -----------------------------

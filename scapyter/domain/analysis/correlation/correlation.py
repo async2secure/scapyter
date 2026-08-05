@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+from scapyter.domain.analysis.correlation.value_objects.trace_statistics import (
+    TraceStatistics,
+)
 from scapyter.domain.value_object import TraceAndModeledLeakage
 
 
@@ -12,5 +15,5 @@ class Correlation(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def compute(self) -> np.ndarray:
+    def compute(self, trace_statics: TraceStatistics) -> np.ndarray:
         raise NotImplementedError

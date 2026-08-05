@@ -1,9 +1,14 @@
 from abc import ABC
 
-from scapyter.domain.value_object import Range, Batch
+from scapyter.domain.value_object import Range, Batch, SingleBatch
 
 
 class ProjectFileReader(ABC):
 
     def get_batch(self, trace_range: Range, sample_slice: slice = slice(None)) -> Batch:
+        raise NotImplementedError
+
+    def get_single_batch(
+        self, index: int, sample_slice: slice = slice(None)
+    ) -> SingleBatch:
         raise NotImplementedError

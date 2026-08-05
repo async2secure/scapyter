@@ -1,5 +1,3 @@
-from scipy.fft import rfftfreq
-
 from scapyter.domain.signal_processing.fft.transform import (
     compute_fft_magnitudes,
 )
@@ -11,10 +9,8 @@ from scapyter.domain.value_object import Batch
 class FFTProcessor(TraceProcessor):
     def __init__(
         self,
-        sampling_rate: float,  # Added: we need this for the x-axis
         window_type: WindowFunctionType | None = None,
     ):
-        self.sampling_rate = sampling_rate
         self.window_type = window_type
 
     def output_shape(self, input_shape):

@@ -35,8 +35,18 @@ class SingleBatch:
         return self.metadata.get("plaintext")
 
     @property
+    def ciphertext(self):
+        return self.metadata.get("ciphertext")
+
+    @property
     def key(self):
         return self.metadata.get("key")
+
+    def with_metadata(self, **metadata: np.ndarray) -> "SingleBatch":
+        return replace(
+            self,
+            metadata={**self.metadata, **metadata},
+        )
 
     def to_batch(self, **changes) -> Batch:
         """
