@@ -2,7 +2,7 @@ import os
 import h5py
 
 from scapyter.domain.repository.project_file_reader import ProjectFileReader
-from scapyter.domain.value_object import Range, SingleBatch, Batch
+from scapyter.domain.value_object import Range, Batch
 
 
 class H5ProjectFileReader(ProjectFileReader):
@@ -47,28 +47,29 @@ class H5ProjectFileReader(ProjectFileReader):
 
         return mapping
 
-    def get_single_batch(
-        self, index: int, sample_slice: slice = slice(None)
-    ) -> SingleBatch:
+    def get_single_batch(self, index: int, sample_range: Range | None = None) -> Batch:
         """The core Repository method: Returns a Domain Entity."""
-        trace = self._hf["traces"][index, sample_slice]
+        return self.get_batch(
+            trace_range=Range(index, index + 1),
+            sample_range=sample_range,
+        )
 
-        metadata = {}
-        for name, dataset in self._map.items():
-            # If 2D (N, Bytes), take the specific row
-            data = dataset[index]
-            metadata[name] = data
-
-        return SingleBatch(index=index, trace=trace, metadata=metadata)
-
-    def get_batch(self, trace_range: Range, sample_slice: slice = slice(None)) -> Batch:
+    def get_batch(
+        self,
+        trace_range: Range,
+        sample_range: Range | None = None,
+    ) -> Batch:
         """
         High-performance bulk loader.
         Requests data in contiguous blocks to minimize HDF5 I/O overhead.
         """
         # 1. Bulk read traces: One I/O operation instead of N
+
+        if sample_range is None:
+            sample_range = Range(0, self.sample_count)
+
         samples_block = self._hf["traces"][
-            trace_range.start : trace_range.end, sample_slice
+            trace_range.start : trace_range.end, sample_range.start : sample_range.end
         ]
 
         # 2. Bulk read all metadata

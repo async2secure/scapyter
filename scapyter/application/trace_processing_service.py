@@ -46,11 +46,6 @@ class TraceProcessingService:
                 total_traces=trace_range.count,
             )
 
-            sample_slice = slice(
-                sample_range.start,
-                sample_range.end,
-            )
-
             for start in range(
                 trace_range.start,
                 trace_range.end,
@@ -63,7 +58,7 @@ class TraceProcessingService:
 
                 batch = reader.get_batch(
                     trace_range=Range(start, end),
-                    sample_slice=sample_slice,
+                    sample_range=sample_range,
                 )
 
                 processed_batch = self.processor.process(batch)

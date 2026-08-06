@@ -7,7 +7,7 @@ from scapyter.domain.value_object import KeyByteGuesses
 
 @dataclass
 class CorrelationFunction:
-    key_byte_guesses: KeyByteGuesses
     correlation: Correlation
     byte_location: int
     leakage_model: LeakageModel
+    key_byte_guesses: KeyByteGuesses = KeyByteGuesses.from_full256_range()

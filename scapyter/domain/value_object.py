@@ -15,21 +15,6 @@ class Batch:
     def __len__(self):
         return self.traces.shape[0]
 
-    def copy_with(self, **changes) -> "Batch":
-        return replace(self, **changes)
-
-
-@dataclass(frozen=True)
-class SingleBatch:
-    """A single trace and all its associated metadata."""
-
-    index: int
-    trace: np.ndarray
-    metadata: dict[str, np.ndarray] = field(default_factory=dict)
-
-    def __getitem__(self, key: str):
-        return self.metadata.get(key)
-
     @property
     def plaintext(self):
         return self.metadata.get("plaintext")
@@ -42,34 +27,14 @@ class SingleBatch:
     def key(self):
         return self.metadata.get("key")
 
-    def with_metadata(self, **metadata: np.ndarray) -> "SingleBatch":
+    def with_metadata(self, **metadata: np.ndarray) -> "Batch":
         return replace(
             self,
             metadata={**self.metadata, **metadata},
         )
 
-    def to_batch(self, **changes) -> Batch:
-        """
-        Converts this single record into a Batch of size N=1.
-        Allows overriding values (like traces) during conversion.
-        """
-        # 1. Prepare the default data (expanding dimensions to 2D)
-        default_indices = range(self.index, self.index + 1)
-        default_traces = self.trace[np.newaxis, :]
-        default_metadata = {
-            k: v[np.newaxis, :] if v.ndim == 1 else v for k, v in self.metadata.items()
-        }
-
-        # 2. Create the Batch instance
-        new_batch = Batch(
-            indices=default_indices, traces=default_traces, metadata=default_metadata
-        )
-
-        # 3. Apply changes if any are provided (Dart-style copyWith)
-        if changes:
-            return new_batch.copy_with(**changes)
-
-        return new_batch
+    def copy_with(self, **changes) -> "Batch":
+        return replace(self, **changes)
 
 
 @dataclass(frozen=True)
@@ -117,6 +82,9 @@ class KeyByteGuesses:
 
     def __iter__(self) -> Iterator[int]:
         return iter(self.values)
+
+    def __len__(self) -> int:
+        return len(self.values)
 
 
 @dataclass(frozen=True)
