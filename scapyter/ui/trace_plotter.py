@@ -13,10 +13,10 @@ class TracePlotter:
 
     def plot_single(self, index, sample_range: Range | None = None, color="blue"):
         """Plots a single trace from the repository."""
-        trace = self.repo.get_single_batch(index, sample_range=sample_range)
+        batch = self.repo.get_single_batch(index, sample_range=sample_range)
 
         plt.figure(figsize=(12, 4))
-        plt.plot(trace.traces[0], color=color, linewidth=0.7)
+        plt.plot(batch.traces, color=color, linewidth=0.7)
         plt.title(f"Trace {index}")
         plt.xlabel("Sample Index")
         plt.ylabel("Amplitude")
@@ -57,4 +57,54 @@ class TracePlotter:
 
         plt.title(f"Statistical Analysis (N={len(batch.trace)})")
         plt.legend()
+        plt.show()
+
+    def plot_fft_processed(
+        self,
+        index,
+        fs,
+        db=True,
+    ):
+        """
+        Plot processed FFT magnitude trace.
+
+        Assumes repository contains:
+            abs(rFFT(trace))
+            with DC bin already removed if desired.
+        """
+
+        batch = self.repo.get_single_batch(index)
+
+        magnitude = batch.traces[0].astype(np.float64)
+
+        if db:
+            magnitude = 20 * np.log10(magnitude + 1e-12)
+
+        # FFT output length
+        fft_bins = len(magnitude)
+
+        # If FFTProcessor removes DC bin:
+        # bins correspond to frequencies 1..Nyquist
+        freqs = np.linspace(
+            fs / fft_bins,
+            fs / 2,
+            fft_bins,
+        )
+
+        plt.figure(figsize=(12, 4))
+
+        plt.plot(
+            freqs / 1e6,
+            magnitude,
+            linewidth=0.8,
+        )
+
+        plt.title(f"FFT Spectrum - Trace {index}")
+
+        plt.xlabel("Frequency (MHz)")
+
+        plt.ylabel("Magnitude (dB)" if db else "Magnitude")
+
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
         plt.show()
