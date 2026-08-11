@@ -27,6 +27,12 @@ class Batch:
     def key(self):
         return self.metadata.get("key")
 
+    @property
+    def trace(self) -> np.ndarray:
+        if len(self) != 1:
+            raise ValueError("trace is only available for a single-trace batch")
+        return self.traces[0]
+
     def with_metadata(self, **metadata: np.ndarray) -> "Batch":
         return replace(
             self,

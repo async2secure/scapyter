@@ -16,7 +16,7 @@ class TracePlotter:
         batch = self.repo.get_single_batch(index, sample_range=sample_range)
 
         plt.figure(figsize=(12, 4))
-        plt.plot(batch.traces, color=color, linewidth=0.7)
+        plt.plot(batch.trace, color=color, linewidth=0.7)
         plt.title(f"Trace {index}")
         plt.xlabel("Sample Index")
         plt.ylabel("Amplitude")
