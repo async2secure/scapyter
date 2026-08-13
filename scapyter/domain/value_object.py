@@ -6,26 +6,49 @@ from typing import Iterator
 import numpy as np
 
 
+from dataclasses import dataclass, replace
+
+import numpy as np
+
+
 @dataclass(frozen=True)
 class Batch:
     indices: range
     traces: np.ndarray  # Shape: (N, Samples)
     metadata: dict[str, np.ndarray]  # Values are Shape: (N, Bytes)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.traces.shape[0]
 
     @property
-    def plaintext(self):
+    def plaintexts(self) -> np.ndarray | None:
         return self.metadata.get("plaintext")
 
     @property
-    def ciphertext(self):
+    def ciphertexts(self) -> np.ndarray | None:
         return self.metadata.get("ciphertext")
 
     @property
-    def key(self):
+    def keys(self) -> np.ndarray | None:
         return self.metadata.get("key")
+
+    @property
+    def plaintext(self) -> np.ndarray:
+        if len(self) != 1:
+            raise ValueError("plaintext is only available for a single-trace batch")
+        return self.plaintexts[0]
+
+    @property
+    def ciphertext(self) -> np.ndarray:
+        if len(self) != 1:
+            raise ValueError("ciphertext is only available for a single-trace batch")
+        return self.ciphertexts[0]
+
+    @property
+    def key(self) -> np.ndarray:
+        if len(self) != 1:
+            raise ValueError("key is only available for a single-trace batch")
+        return self.keys[0]
 
     @property
     def trace(self) -> np.ndarray:
