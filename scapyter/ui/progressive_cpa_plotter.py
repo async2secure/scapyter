@@ -59,26 +59,16 @@ class ProgressiveCpaPlotter:
         if ax is None:
             _, ax = plt.subplots(figsize=(10, 6))
 
-        processed_traces = [
-            result.processed_traces
-            for result in self._results
-        ]
+        processed_traces = [result.processed_traces for result in self._results]
 
         byte_results = [
-            next(
-                b
-                for b in result.byte_results
-                if b.byte_index == byte_index
-            )
+            next(b for b in result.byte_results if b.byte_index == byte_index)
             for result in self._results
         ]
 
         guesses = list(byte_results[0].key_candidates)
 
-        correlation_history: dict[int, list[float]] = {
-            guess: []
-            for guess in guesses
-        }
+        correlation_history: dict[int, list[float]] = {guess: [] for guess in guesses}
 
         #
         # Compute:

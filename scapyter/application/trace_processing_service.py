@@ -43,9 +43,16 @@ class TraceProcessingService:
                 trace_range = self.range_parameters.trace_range
                 sample_range = self.range_parameters.sample_range
 
+            input_shape = (
+                trace_range.count,
+                sample_range.count,
+            )
+
+            output_shape = self.processor.output_shape(input_shape)
+
             writer = H5ProjectFileWriter(
                 file_path=self.output_path,
-                total_traces=trace_range.count,
+                total_traces=output_shape[0],
             )
 
             for start in tqdm(

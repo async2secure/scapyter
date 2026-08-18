@@ -59,8 +59,7 @@ class ProgressiveCorrelationService:
             sample_range = self._range_parameters.sample_range
 
             batch = self._project_file_reader.get_batch(
-                batch_range,
-                sample_range=sample_range
+                batch_range, sample_range=sample_range
             )
 
             known_data = batch.metadata[self._data_source.value]
