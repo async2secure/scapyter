@@ -14,15 +14,13 @@ class TraceProcessingService:
         output_path: str,
         processor: TraceProcessor,
         range_parameters: RangeParameters | None = None,
-        batch_size: int = 1000,
     ):
         self.input_path = input_path
         self.output_path = output_path
         self.processor = processor
         self.range_parameters = range_parameters
-        self.batch_size = batch_size
 
-    def execute(self):
+    def run(self, batch_size: int = 100) -> None:
 
         with H5ProjectFileReader(self.input_path) as reader:
 
@@ -59,13 +57,13 @@ class TraceProcessingService:
                 range(
                     trace_range.start,
                     trace_range.end,
-                    self.batch_size,
+                    batch_size,
                 ),
                 desc="Processing traces",
                 unit="batch",
             ):
                 end = min(
-                    start + self.batch_size,
+                    start + batch_size,
                     trace_range.end,
                 )
 

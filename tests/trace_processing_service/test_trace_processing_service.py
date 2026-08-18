@@ -70,10 +70,9 @@ def test_trace_processing_service_keeps_odd_traces(tmp_path):
         input_path=str(input_path),
         output_path=str(output_path),
         processor=OddTraceProcessor(),
-        batch_size=6,
     )
 
-    service.execute()
+    service.run()
 
     # Check real output H5 file
     with h5py.File(output_path, "r") as hf:
