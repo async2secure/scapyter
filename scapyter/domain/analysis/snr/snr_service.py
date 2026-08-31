@@ -11,23 +11,19 @@ from scapyter.domain.value_object import RangeParameters, DataSource
 class SnrService:
     def __init__(
         self,
-        byte_location: int,
         range_parameters: RangeParameters,
-        known_key_byte: int,
         leakage_model: LeakageModel,
         project_file_reader: ProjectFileReader,
         data_source: DataSource,
-        snr: ProgressiveSnr,
     ) -> None:
-        self._byte_location = byte_location
         self._range_parameters = range_parameters
         self._leakage_model = leakage_model
         self._project_file_reader = project_file_reader
         self._data_source = data_source
-        self._snr = snr
-        self._known_key_byte = known_key_byte
 
-    def run(self, batch_size: int = 50) -> np.ndarray:
+
+    def run(self, byte_location: int, known_key_byte: int,  batch_size: int = 50, ) -> np.ndarray:
+        snr = ProgressiveSnr()
         trace_range = self._range_parameters.trace_range
         progress_steps = trace_range.count
         progress, batch_range_list = get_progress_batch(
@@ -45,12 +41,12 @@ class SnrService:
             known_data = batch.metadata[self._data_source.value]
 
             modeled_leakage = self._leakage_model.calculate(
-                byte_location=self._byte_location,
+                byte_location=byte_location,
                 known_data=known_data,
-                key_guess=self._known_key_byte,
+                key_guess=known_key_byte,
                 meta=batch.metadata,
             )
 
-            self._snr.update(traces=batch.traces, hex_array=np.asarray(modeled_leakage))
+            snr.update(traces=batch.traces, hex_array=np.asarray(modeled_leakage))
 
-        return self._snr.finalize()
+        return snr.finalize()
