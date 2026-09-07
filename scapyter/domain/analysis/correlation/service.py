@@ -53,7 +53,7 @@ class CorrelationService:
             )
 
             known_data = batch.metadata[self._data_source.value]
-
+            self._trace_statics_accumulator.update(batch.traces)
             for func in self._correlation_functions:
                 modeled_leakages = []
 
@@ -69,7 +69,7 @@ class CorrelationService:
                     traces=batch.traces,
                     modeled_leakage=np.asarray(modeled_leakages).T,
                 )
-                self._trace_statics_accumulator.update(batch.traces)
+
                 func.correlation.update(trace_and_modeled_leakage)
         statics = self._trace_statics_accumulator.compute()
         return [
