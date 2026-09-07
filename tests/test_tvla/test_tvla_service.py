@@ -46,7 +46,7 @@ def test_tvla_service_update_accumulates_correctly(mock_repo, range_params):
 
     mock_repo.get_batch.assert_called_once()
     _, kwargs = mock_repo.get_batch.call_args
-    assert kwargs["sample_slice"] == slice(0, 3)
+    assert kwargs["sample_range"] == Range(0, 3)
 
 
 def test_tvla_service_empty_range_handling(mock_repo):

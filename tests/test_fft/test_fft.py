@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from scipy.fft import rfft
 
-from scapyter.domain.signal_processing.fft.transform import compute_fft_magnitudes
+from scapyter.domain.signal_processing.fft.transform import compute_fft
 from scapyter.domain.signal_processing.fft.window_type import WindowFunctionType
 
 
@@ -10,9 +10,16 @@ def test_compute_fft_magnitudes_without_window():
     traces = np.array([[1.0, 2.0, 3.0, 4.0]])
     sampling_count = 4
 
-    result = compute_fft_magnitudes(traces, sampling_count)
+    result = compute_fft(
+        traces,
+        sampling_count,
+        remove_dc=False,
+        remove_dc_bin=False,
+    )
 
-    expected = np.abs(rfft(traces, axis=-1) / sampling_count).astype(np.float64)
+    expected = np.abs(
+        rfft(traces, axis=-1) / sampling_count
+    ).astype(np.float64)
 
     np.testing.assert_allclose(result, expected)
     assert result.dtype == np.float64
@@ -22,38 +29,44 @@ def test_compute_fft_magnitudes_with_hamming_window():
     traces = np.array([[1.0, 2.0, 3.0, 4.0]])
     sampling_count = 4
 
-    result = compute_fft_magnitudes(
+    result = compute_fft(
         traces,
         sampling_count,
         window_type=WindowFunctionType.HAMMING,
+        remove_dc=False,
+        remove_dc_bin=False,
     )
 
     windowed = traces * np.hamming(sampling_count)
 
-    spectrum = rfft(windowed, axis=-1) / sampling_count
-
-    expected = np.abs(spectrum).astype(np.float64)
+    expected = np.abs(
+        rfft(windowed, axis=-1) / sampling_count
+    ).astype(np.float64)
 
     np.testing.assert_allclose(result, expected)
+    assert result.dtype == np.float64
 
 
 def test_compute_fft_magnitudes_with_hanning_window():
     traces = np.array([[1.0, 2.0, 3.0, 4.0]])
     sampling_count = 4
 
-    result = compute_fft_magnitudes(
+    result = compute_fft(
         traces,
         sampling_count,
         window_type=WindowFunctionType.HANNING,
+        remove_dc=False,
+        remove_dc_bin=False,
     )
 
     windowed = traces * np.hanning(sampling_count)
 
-    spectrum = rfft(windowed, axis=-1) / sampling_count
-
-    expected = np.abs(spectrum).astype(np.float64)
+    expected = np.abs(
+        rfft(windowed, axis=-1) / sampling_count
+    ).astype(np.float64)
 
     np.testing.assert_allclose(result, expected)
+    assert result.dtype == np.float64
 
 
 def test_compute_fft_magnitudes_handles_multiple_traces():
@@ -65,9 +78,17 @@ def test_compute_fft_magnitudes_handles_multiple_traces():
     )
     sampling_count = 4
 
-    result = compute_fft_magnitudes(traces, sampling_count)
+    result = compute_fft(traces, sampling_count)
 
-    expected = np.abs(rfft(traces, axis=-1) / sampling_count).astype(np.float64)
+    centered = traces - np.mean(
+        traces,
+        axis=-1,
+        keepdims=True,
+    )
+
+    expected = np.abs(
+        rfft(centered, axis=-1) / sampling_count
+    )[:, 1:].astype(np.float64)
 
     np.testing.assert_allclose(result, expected)
     assert result.shape == expected.shape
@@ -84,7 +105,7 @@ def test_compute_fft_magnitudes_handles_multiple_traces():
 def test_compute_fft_magnitudes_output_is_non_negative(window_type):
     traces = np.random.rand(3, 8)
 
-    result = compute_fft_magnitudes(
+    result = compute_fft(
         traces,
         sampling_count=8,
         window_type=window_type,
