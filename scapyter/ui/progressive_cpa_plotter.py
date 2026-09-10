@@ -12,6 +12,8 @@ class ProgressiveCpaPlotter:
     """
     Plot progressive CPA results.
 
+    Each ProgressiveCpaResult represents one byte at one trace count.
+
     Each line represents one key guess. The y-axis is the maximum absolute
     correlation over all samples after each progressive update.
 
@@ -33,7 +35,7 @@ class ProgressiveCpaPlotter:
         correct_key: int | None = None,
         ax: plt.Axes | None = None,
         show: bool = True,
-    ) -> plt.Axes:
+    ) -> None:
         """
         Plot maximum absolute correlation versus processed traces.
 
@@ -59,14 +61,24 @@ class ProgressiveCpaPlotter:
         if ax is None:
             _, ax = plt.subplots(figsize=(10, 6))
 
-        processed_traces = [result.processed_traces for result in self._results]
-
+        # Only use results belonging to the requested byte.
         byte_results = [
-            next(b for b in result.byte_results if b.byte_index == byte_index)
+            result
             for result in self._results
+            if result.byte_result.byte_index == byte_index
         ]
 
-        guesses = list(byte_results[0].key_candidates)
+        if not byte_results:
+            raise ValueError(f"No progressive results found for byte {byte_index}")
+
+        # Sort by number of processed traces.
+        byte_results.sort(key=lambda result: result.processed_traces)
+
+        processed_traces = [result.processed_traces for result in byte_results]
+
+        first_byte_result = byte_results[0].byte_result
+
+        guesses = list(first_byte_result.key_candidates)
 
         correlation_history: dict[int, list[float]] = {guess: [] for guess in guesses}
 
@@ -81,10 +93,10 @@ class ProgressiveCpaPlotter:
         # ]
         #
         for result in byte_results:
+            byte_result = result.byte_result
 
             for row, guess in enumerate(guesses):
-
-                max_corr = np.max(np.abs(result.corr_matrix[row]))
+                max_corr = np.max(np.abs(byte_result.corr_matrix[row]))
 
                 correlation_history[guess].append(max_corr)
 
@@ -93,18 +105,16 @@ class ProgressiveCpaPlotter:
         #
         best_guess = max(
             correlation_history,
-            key=lambda g: correlation_history[g][-1],
+            key=lambda guess: correlation_history[guess][-1],
         )
 
         #
         # Plot all guesses.
         #
         for guess in guesses:
-
             history = correlation_history[guess]
 
             if guess == correct_key:
-
                 ax.plot(
                     processed_traces,
                     history,
@@ -115,7 +125,6 @@ class ProgressiveCpaPlotter:
                 )
 
             elif guess == best_guess:
-
                 ax.plot(
                     processed_traces,
                     history,
@@ -126,7 +135,6 @@ class ProgressiveCpaPlotter:
                 )
 
             else:
-
                 ax.plot(
                     processed_traces,
                     history,
@@ -142,8 +150,7 @@ class ProgressiveCpaPlotter:
 
         ax.grid(True, linestyle="--", alpha=0.3)
 
-        if correct_key is not None or best_guess is not None:
-            ax.legend()
+        ax.legend()
 
         plt.tight_layout()
 
