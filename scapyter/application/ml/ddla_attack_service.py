@@ -4,7 +4,7 @@ from tqdm import tqdm
 from scapyter.application.ml.preprocessing.preprocessing_project_file_reader import (
     ProcessedProjectFileReader,
 )
-from scapyter.domain.leakage.leakage import LeakageModel
+from scapyter.domain.targets.targets import Target
 from scapyter.domain.ml.distinguishers import NonProfiledDistinguisher
 from scapyter.domain.ml.value_objects import AttackMetric, AttackResult
 from scapyter.domain.value_object import DataSource, Range, KeyByteGuesses
@@ -16,7 +16,7 @@ class DDLAAttackService:
     def __init__(
         self,
         distinguisher: NonProfiledDistinguisher,
-        leakage_model: LeakageModel,
+        leakage_model: Target,
         data_source: DataSource,
         project_file_reader: ProcessedProjectFileReader,
     ):

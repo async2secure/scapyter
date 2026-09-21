@@ -17,9 +17,7 @@ def test_compute_fft_magnitudes_without_window():
         remove_dc_bin=False,
     )
 
-    expected = np.abs(
-        rfft(traces, axis=-1) / sampling_count
-    ).astype(np.float64)
+    expected = np.abs(rfft(traces, axis=-1) / sampling_count).astype(np.float64)
 
     np.testing.assert_allclose(result, expected)
     assert result.dtype == np.float64
@@ -39,9 +37,7 @@ def test_compute_fft_magnitudes_with_hamming_window():
 
     windowed = traces * np.hamming(sampling_count)
 
-    expected = np.abs(
-        rfft(windowed, axis=-1) / sampling_count
-    ).astype(np.float64)
+    expected = np.abs(rfft(windowed, axis=-1) / sampling_count).astype(np.float64)
 
     np.testing.assert_allclose(result, expected)
     assert result.dtype == np.float64
@@ -61,9 +57,7 @@ def test_compute_fft_magnitudes_with_hanning_window():
 
     windowed = traces * np.hanning(sampling_count)
 
-    expected = np.abs(
-        rfft(windowed, axis=-1) / sampling_count
-    ).astype(np.float64)
+    expected = np.abs(rfft(windowed, axis=-1) / sampling_count).astype(np.float64)
 
     np.testing.assert_allclose(result, expected)
     assert result.dtype == np.float64
@@ -86,9 +80,9 @@ def test_compute_fft_magnitudes_handles_multiple_traces():
         keepdims=True,
     )
 
-    expected = np.abs(
-        rfft(centered, axis=-1) / sampling_count
-    )[:, 1:].astype(np.float64)
+    expected = np.abs(rfft(centered, axis=-1) / sampling_count)[:, 1:].astype(
+        np.float64
+    )
 
     np.testing.assert_allclose(result, expected)
     assert result.shape == expected.shape

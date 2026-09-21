@@ -1,8 +1,7 @@
 import numpy as np
 
 from abc import abstractmethod, ABC
-from scapyter.domain.leakage.constants.hamming_weight_value import HW
-from scapyter.domain.leakage.constants.sbox_values import SBOX, INV_SBOX
+from scapyter.domain.targets.constants.sbox_values import SBOX, INV_SBOX
 
 
 def inverse_shift_rows(state: np.ndarray) -> np.ndarray:
@@ -89,7 +88,7 @@ def shift_rows(state: np.ndarray) -> np.ndarray:
     ]
 
 
-class LeakageModel(ABC):
+class Target(ABC):
 
     @abstractmethod
     def calculate(
@@ -102,7 +101,7 @@ class LeakageModel(ABC):
         raise NotImplementedError
 
 
-class InvSboxOutputLeakageModel(LeakageModel):
+class InvSboxOutput(Target):
 
     def calculate(
         self,
@@ -113,11 +112,10 @@ class InvSboxOutputLeakageModel(LeakageModel):
     ) -> np.ndarray:
         sliced_data = known_data[:, byte_location]
         state = sliced_data ^ key_guess
-        intermediate_values = INV_SBOX[state]
-        return HW[intermediate_values]
+        return INV_SBOX[state]
 
 
-class InverseShiftRowInvSboxOutputLeakageModel(LeakageModel):
+class InverseShiftRowInvSboxOutput(Target):
 
     def calculate(
         self,
@@ -133,15 +131,10 @@ class InverseShiftRowInvSboxOutputLeakageModel(LeakageModel):
 
         state = sliced_data ^ key_guess
 
-        intermediate_values = INV_SBOX[state]
-
-        return HW[intermediate_values]
+        return INV_SBOX[state]
 
 
-import numpy as np
-
-
-class ShiftRowsInvSboxXorLeakageModel(LeakageModel):
+class ShiftRowsInvSboxXor(Target):
 
     def calculate(
         self,
@@ -154,7 +147,7 @@ class ShiftRowsInvSboxXorLeakageModel(LeakageModel):
         # SR(CT)
         shifted_ct = shift_rows(known_data)
 
-        # Select the target byte of SR(CT)
+        # Select the targets byte of SR(CT)
         sr_byte = shifted_ct[:, byte_location]
 
         # CT ^ KEY
@@ -164,13 +157,10 @@ class ShiftRowsInvSboxXorLeakageModel(LeakageModel):
         inv_sbox_out = INV_SBOX[ct_key]
 
         # SR(CT) ^ ISB(CT ^ KEY)
-        intermediate = sr_byte ^ inv_sbox_out
-
-        # HW(SR(CT) ^ ISB(CT ^ KEY))
-        return HW[intermediate]
+        return sr_byte ^ inv_sbox_out
 
 
-class SboxOutputLeakageModel(LeakageModel):
+class SboxOutput(Target):
 
     def calculate(
         self,
@@ -181,11 +171,10 @@ class SboxOutputLeakageModel(LeakageModel):
     ) -> np.ndarray:
         plaintext_byte = known_data[:, byte_location]
         state = plaintext_byte ^ key_guess
-        intermediate_values = SBOX[state]
-        return HW[intermediate_values]
+        return SBOX[state]
 
 
-class SboxInputOutputHammingDistanceLeakageModel(LeakageModel):
+class SboxInputOutputHammingDistance(Target):
 
     def calculate(
         self,
@@ -203,7 +192,4 @@ class SboxInputOutputHammingDistanceLeakageModel(LeakageModel):
         sbox_out = SBOX[state]
 
         # (PT ^ K) ^ SBOX(PT ^ K)
-        intermediate = state ^ sbox_out
-
-        # Hamming Weight leakage
-        return HW[intermediate]
+        return state ^ sbox_out

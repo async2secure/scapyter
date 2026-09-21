@@ -64,19 +64,12 @@ class ProgressiveCorrelationService:
 
             trace_statistics_accumulator.update(batch.traces)
 
-            modeled_leakages = [
-                correlation_function.leakage_model.calculate(
-                    byte_location=correlation_function.byte_location,
-                    known_data=known_data,
-                    key_guess=key_guess,
-                )
-                for key_guess in correlation_function.key_byte_guesses
-            ]
+            modeled_leakages = correlation_function.leakage_model.calculate(known_data)
 
             correlation_function.correlation.update(
                 TraceAndModeledLeakage(
                     traces=batch.traces,
-                    modeled_leakage=np.asarray(modeled_leakages).T,
+                    modeled_leakage=modeled_leakages,
                 )
             )
 
@@ -101,8 +94,8 @@ class ProgressiveCorrelationService:
         return ProgressiveCpaResult(
             processed_traces=processed_traces,
             byte_result=CpaByteResult(
-                byte_index=correlation_function.byte_location,
-                key_candidates=correlation_function.key_byte_guesses,
+                byte_index=correlation_function.leakage_model.byte_location,
+                key_candidates=correlation_function.leakage_model.key_byte_guesses,
                 corr_matrix=correlation_function.correlation.compute(statistics),
             ),
         )

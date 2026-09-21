@@ -8,7 +8,7 @@ from scapyter.domain.analysis.correlation.service import CorrelationService
 from scapyter.domain.analysis.correlation.value_objects.correlation_functions import (
     CorrelationFunction,
 )
-from scapyter.domain.leakage.leakage import SboxOutputLeakageModel
+from scapyter.domain.targets.targets import SboxOutput
 from scapyter.domain.repository.project_file_reader import ProjectFileReader
 from scapyter.domain.value_object import (
     DataSource,
@@ -56,7 +56,7 @@ def test_correlation_service_matches_scipy_pearson():
     correlation_function = CorrelationFunction(
         correlation=CpaCorrelation(),
         byte_location=0,
-        leakage_model=SboxOutputLeakageModel(),
+        target=SboxOutput(),
         key_byte_guesses=KeyByteGuesses([key_guess]),
     )
 
@@ -76,7 +76,7 @@ def test_correlation_service_matches_scipy_pearson():
 
     actual = results[0].corr_matrix
 
-    leakage = correlation_function.leakage_model.calculate(
+    leakage = correlation_function.target.calculate(
         byte_location=correlation_function.byte_location,
         known_data=known_data,
         key_guess=key_guess,
