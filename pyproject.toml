@@ -15,7 +15,8 @@ dependencies = [
     "numba",
     "matplotlib",
     "pandas",
-    "jinja2"
+    "jinja2",
+    "tqdm",
 ]
 
 authors = [
