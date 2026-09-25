@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import Dataset
 
-from scapyter.domain.leakage.leakage import LeakageModel
+from scapyter.domain.targets.targets import Target
 from scapyter.domain.value_object import DataSource
 from scapyter.infrastructure.ml.strategy.loss_strategy import LossStrategy
 from scapyter.infrastructure.ml.stream_dataset import StreamDataset
@@ -12,7 +12,7 @@ class HypotheticalLabelDataset(Dataset):
     def __init__(
         self,
         base_dataset: StreamDataset,
-        leakage_model: LeakageModel,
+        leakage_model: Target,
         key_guess: int,
         byte_location: int,
         data_source: DataSource,

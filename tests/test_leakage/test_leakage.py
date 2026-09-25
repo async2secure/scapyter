@@ -1,6 +1,6 @@
 import numpy as np
 
-from scapyter.domain.leakage.leakage import SboxOutputLeakageModel
+from scapyter.domain.targets.targets import SboxOutput
 
 
 def test_sbox_leakage_calculation():
@@ -13,7 +13,7 @@ def test_sbox_leakage_calculation():
     """
     # Setup: 1 trace, 1 byte (value 0x00)
     plaintexts = np.array([[0x00]], dtype=np.uint8)
-    model = SboxOutputLeakageModel()
+    model = SboxOutput()
 
     # Calculate for byte_location 0, key guess 0x12
     result = model.calculate(byte_location=0, key_guess=0x12, known_data=plaintexts)
@@ -31,7 +31,7 @@ def test_vectorization_multiple_traces():
     # Trace 1: byte 1 is 0xFF
     plaintexts = np.array([[0x00, 0xAB], [0x00, 0xFF]], dtype=np.uint8)
 
-    model = SboxOutputLeakageModel()
+    model = SboxOutput()
     guess = 0x00  # XORing with 0 keeps values same
 
     # Sbox(0xAB) = 0x62 -> HW(01100010) = 3
@@ -47,7 +47,7 @@ def test_wrong_guess_produces_different_leakage():
     Ensure different key guesses produce different power models.
     """
     plaintexts = np.array([[0x42]], dtype=np.uint8)
-    model = SboxOutputLeakageModel()
+    model = SboxOutput()
 
     leakage_guess_1 = model.calculate(
         byte_location=0, key_guess=0x01, known_data=plaintexts

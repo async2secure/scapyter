@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from scapyter.domain.value_object import Batch
+from scapyter.domain.value_object import Batch, Range
 
 
 class TraceProcessor(ABC):
@@ -12,5 +12,5 @@ class TraceProcessor(ABC):
     def process(self, batch: Batch) -> Batch:
         pass
 
-    def output_shape(self, input_shape):
+    def output_shape(self, input_shape: tuple[int, int]) -> tuple[int, int]:
         return input_shape

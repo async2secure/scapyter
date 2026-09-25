@@ -2,7 +2,7 @@ import numpy as np
 from tqdm import tqdm
 
 from scapyter.domain.analysis.snr.snr import ProgressiveSnr
-from scapyter.domain.leakage.leakage import LeakageModel
+from scapyter.domain.targets.targets import Target
 from scapyter.domain.progress_range.progress_range import get_progress_batch
 from scapyter.domain.repository.project_file_reader import ProjectFileReader
 from scapyter.domain.value_object import RangeParameters, DataSource
@@ -13,7 +13,7 @@ class MultiByteSnrService:
         self,
         range_parameters: RangeParameters,
         known_key_bytes: dict[int, int],
-        leakage_model: LeakageModel,
+        leakage_model: Target,
         project_file_reader: ProjectFileReader,
         data_source: DataSource,
     ):

@@ -1,3 +1,5 @@
+from tqdm import tqdm
+
 from scapyter.domain.signal_processing.trace_processor import TraceProcessor
 from scapyter.domain.value_object import Range, RangeParameters
 from scapyter.infrastructure.h5_project_file_reader import H5ProjectFileReader
@@ -12,15 +14,13 @@ class TraceProcessingService:
         output_path: str,
         processor: TraceProcessor,
         range_parameters: RangeParameters | None = None,
-        batch_size: int = 1000,
     ):
         self.input_path = input_path
         self.output_path = output_path
         self.processor = processor
         self.range_parameters = range_parameters
-        self.batch_size = batch_size
 
-    def execute(self):
+    def run(self, batch_size: int = 100) -> None:
 
         with H5ProjectFileReader(self.input_path) as reader:
 
@@ -41,18 +41,29 @@ class TraceProcessingService:
                 trace_range = self.range_parameters.trace_range
                 sample_range = self.range_parameters.sample_range
 
-            writer = H5ProjectFileWriter(
-                file_path=self.output_path,
-                total_traces=trace_range.count,
+            input_shape = (
+                trace_range.count,
+                sample_range.count,
             )
 
-            for start in range(
-                trace_range.start,
-                trace_range.end,
-                self.batch_size,
+            output_shape = self.processor.output_shape(input_shape)
+
+            writer = H5ProjectFileWriter(
+                file_path=self.output_path,
+                total_traces=output_shape[0],
+            )
+
+            for start in tqdm(
+                range(
+                    trace_range.start,
+                    trace_range.end,
+                    batch_size,
+                ),
+                desc="Processing traces",
+                unit="batch",
             ):
                 end = min(
-                    start + self.batch_size,
+                    start + batch_size,
                     trace_range.end,
                 )
 

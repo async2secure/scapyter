@@ -12,7 +12,7 @@ from .hypothetical_label_dataset import HypotheticalLabelDataset
 from .strategy.loss_strategy import LossStrategy
 from .stream_dataset import StreamDataset
 from .trainer import PyTorchTrainer
-from ...domain.leakage.leakage import LeakageModel
+from ...domain.targets.targets import Target
 from ...domain.ml.distinguishers import NonProfiledDistinguisher
 from ...domain.ml.value_objects import TrainingResult
 from ...domain.value_object import DataSource
@@ -55,7 +55,7 @@ class PyTorchDdlaAdapter(NonProfiledDistinguisher):
         self,
         train_dataset: StreamDataset,
         validation_dataset: StreamDataset | None,
-        leakage_model: LeakageModel,
+        leakage_model: Target,
         byte_location: int,
         key_guess: int,
         data_source: DataSource,

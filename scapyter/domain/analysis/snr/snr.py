@@ -65,11 +65,7 @@ class _GroupedStreamingStats:
                 total = c1 + c2
 
                 self._means[key] = m1 + delta * (c2 / total)
-                self._m2s[key] = (
-                        s1
-                        + s2
-                        + delta * delta * (c1 * c2 / total)
-                )
+                self._m2s[key] = s1 + s2 + delta * delta * (c1 * c2 / total)
                 self._counts[key] = total
 
     # -----------------------------
