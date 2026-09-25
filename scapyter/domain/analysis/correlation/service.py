@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 from scapyter.domain.analysis.correlation.trace_statistics_accumulator import (
     TraceStatisticsAccumulator,
@@ -39,7 +40,11 @@ class CorrelationService:
             trace_range=trace_range,
         )
 
-        for batch_range in batch_range_list:
+        for batch_range in tqdm(
+            batch_range_list,
+            desc="Processing batches",
+            unit="batch",
+        ):
             sample_range = self._range_parameters.sample_range
 
             batch = self._project_file_reader.get_batch(

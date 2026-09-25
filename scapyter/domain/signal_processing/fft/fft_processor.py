@@ -1,29 +1,44 @@
-from scapyter.domain.signal_processing.fft.transform import (
-    compute_fft_magnitudes,
-)
-from scapyter.domain.signal_processing.fft.window_type import WindowFunctionType
 from scapyter.domain.signal_processing.trace_processor import TraceProcessor
+from scapyter.domain.signal_processing.fft.transform import compute_fft
+from scapyter.domain.signal_processing.fft.window_type import WindowFunctionType
 from scapyter.domain.value_object import Batch
 
 
 class FFTProcessor(TraceProcessor):
+
     def __init__(
         self,
         window_type: WindowFunctionType | None = None,
+        remove_dc: bool = True,
+        remove_dc_bin: bool = True,
     ):
         self.window_type = window_type
+        self.remove_dc = remove_dc
+        self.remove_dc_bin = remove_dc_bin
 
     def output_shape(self, input_shape):
         trace_count, sample_count = input_shape
-        return (trace_count, sample_count // 2 + 1)
+
+        fft_size = sample_count // 2 + 1
+
+        if self.remove_dc_bin:
+            fft_size -= 1
+
+        return (
+            trace_count,
+            fft_size,
+        )
 
     def process(self, batch: Batch) -> Batch:
+
         sampling_count = batch.traces.shape[-1]
 
-        fft_traces = compute_fft_magnitudes(
+        fft_traces = compute_fft(
             traces=batch.traces,
             sampling_count=sampling_count,
             window_type=self.window_type,
+            remove_dc=self.remove_dc,
+            remove_dc_bin=self.remove_dc_bin,
         )
 
         return Batch(
