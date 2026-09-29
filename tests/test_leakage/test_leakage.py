@@ -11,14 +11,16 @@ def test_sbox_leakage_calculation():
     Step 2: Sbox(0x12) = 0xC9 (decimal 201)
     Step 3: HW(0xC9) -> HW(11001001 binary) = 4
     """
-    # Setup: 1 trace, 1 byte (value 0x00)
     plaintexts = np.array([[0x00]], dtype=np.uint8)
     model = SboxOutput()
 
-    # Calculate for byte_location 0, key guess 0x12
-    result = model.calculate(byte_location=0, key_guess=0x12, known_data=plaintexts)
+    result = model.calculate(
+        byte_location=0,
+        key_guess=0x12,
+        known_data=plaintexts,
+    )
 
-    assert result[0] == 4
+    assert result[0] == 0xC9
     assert isinstance(result, np.ndarray)
 
 
@@ -26,34 +28,44 @@ def test_vectorization_multiple_traces():
     """
     Test that the model processes multiple traces simultaneously.
     """
-    # Two traces, targeting byte index 1
     # Trace 0: byte 1 is 0xAB
     # Trace 1: byte 1 is 0xFF
-    plaintexts = np.array([[0x00, 0xAB], [0x00, 0xFF]], dtype=np.uint8)
+    plaintexts = np.array(
+        [[0x00, 0xAB], [0x00, 0xFF]],
+        dtype=np.uint8,
+    )
 
     model = SboxOutput()
-    guess = 0x00  # XORing with 0 keeps values same
+    guess = 0x00
 
-    # Sbox(0xAB) = 0x62 -> HW(01100010) = 3
-    # Sbox(0xFF) = 0x16 -> HW(00010110) = 3
+    # Sbox(0xAB) = 0x62
+    # Sbox(0xFF) = 0x16
+    results = model.calculate(
+        byte_location=1,
+        key_guess=guess,
+        known_data=plaintexts,
+    )
 
-    results = model.calculate(byte_location=1, key_guess=guess, known_data=plaintexts)
-
-    np.testing.assert_array_equal(results, [3, 3])
+    np.testing.assert_array_equal(results, [0x62, 0x16])
 
 
 def test_wrong_guess_produces_different_leakage():
     """
-    Ensure different key guesses produce different power models.
+    Ensure different key guesses produce different S-box outputs.
     """
     plaintexts = np.array([[0x42]], dtype=np.uint8)
     model = SboxOutput()
 
     leakage_guess_1 = model.calculate(
-        byte_location=0, key_guess=0x01, known_data=plaintexts
-    )
-    leakage_guess_2 = model.calculate(
-        byte_location=0, key_guess=0x02, known_data=plaintexts
+        byte_location=0,
+        key_guess=0x01,
+        known_data=plaintexts,
     )
 
-    assert leakage_guess_1 != leakage_guess_2
+    leakage_guess_2 = model.calculate(
+        byte_location=0,
+        key_guess=0x02,
+        known_data=plaintexts,
+    )
+
+    assert leakage_guess_1[0] != leakage_guess_2[0]

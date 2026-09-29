@@ -8,8 +8,10 @@ from scapyter.domain.analysis.correlation.service import CorrelationService
 from scapyter.domain.analysis.correlation.value_objects.correlation_functions import (
     CorrelationFunction,
 )
-from scapyter.domain.targets.targets import SboxOutput
+from scapyter.domain.leakage_functions.leakage_functions import HammingWeight
+from scapyter.domain.leakage_model.leakage_model import LeakageModel
 from scapyter.domain.repository.project_file_reader import ProjectFileReader
+from scapyter.domain.targets.targets import SboxOutput
 from scapyter.domain.value_object import (
     DataSource,
     KeyByteGuesses,
@@ -53,11 +55,16 @@ def test_correlation_service_matches_scipy_pearson():
 
     key_guess = 0x00
 
+    leakage_model = LeakageModel(
+        target=SboxOutput(),
+        leakage_function=HammingWeight(),
+        byte_location=0,
+        key_byte_guesses=KeyByteGuesses([key_guess]),
+    )
+
     correlation_function = CorrelationFunction(
         correlation=CpaCorrelation(),
-        byte_location=0,
-        target=SboxOutput(),
-        key_byte_guesses=KeyByteGuesses([key_guess]),
+        leakage_model=leakage_model,
     )
 
     params = RangeParameters(
@@ -69,22 +76,25 @@ def test_correlation_service_matches_scipy_pearson():
         range_parameters=params,
         project_file_reader=mock_reader,
         data_source=DataSource.PLAINTEXT,
-        correlation_functions=[correlation_function],
     )
 
-    results = service.run(batch_size=6)
-
-    actual = results[0].corr_matrix
-
-    leakage = correlation_function.target.calculate(
-        byte_location=correlation_function.byte_location,
-        known_data=known_data,
-        key_guess=key_guess,
+    result = service.run(
+        correlation_function=correlation_function,
+        batch_size=6,
     )
+
+    actual = result.corr_matrix
+
+    # LeakageModel.calculate() returns:
+    #   shape = (number_of_traces, number_of_key_guesses)
+    leakage = leakage_model.calculate(known_data)
 
     expected = np.array(
         [
-            pearsonr(traces[:, sample], leakage).statistic
+            pearsonr(
+                traces[:, sample],
+                leakage[:, 0],
+            ).statistic
             for sample in range(traces.shape[1])
         ]
     )
