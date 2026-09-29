@@ -88,10 +88,9 @@ class H5ProjectFileReader(ProjectFileReader):
         """Reads one metadata column without loading any traces."""
         if name not in self._map:
             raise ValueError(
-                f"Metadata field '{name}' not found. "
-                f"Available: {sorted(self._map)}"
+                f"Metadata field '{name}' not found. " f"Available: {sorted(self._map)}"
             )
-        return self._map[name][trace_range.start: trace_range.end]
+        return self._map[name][trace_range.start : trace_range.end]
 
     @property
     def trace_count(self) -> int:

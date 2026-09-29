@@ -51,9 +51,9 @@ def make_service(traces, plaintexts, trace_range=None, **kwargs):
         ],
         metadata={"plaintext": plaintexts[batch_range.start : batch_range.end]},
     )
-    repo.get_metadata.side_effect = (
-        lambda name, trace_range: plaintexts[trace_range.start : trace_range.end]
-    )
+    repo.get_metadata.side_effect = lambda name, trace_range: plaintexts[
+        trace_range.start : trace_range.end
+    ]
     return TvlaService(repo, params, **kwargs), repo
 
 
@@ -281,9 +281,7 @@ def test_empty_range_raises_value_error():
     )
     service = TvlaService(repo, params)
 
-    with pytest.raises(
-        ValueError, match="Welch's t-test requires at least two traces"
-    ):
+    with pytest.raises(ValueError, match="Welch's t-test requires at least two traces"):
         service.calculate()
 
     assert repo.get_batch.called is False
@@ -313,9 +311,7 @@ def test_progression_matches_scipy_at_every_step(dataset):
     for result in results:
         end = result.trace_end
         assert result.trace_start == 0
-        assert np.allclose(
-            result.t_scores, expected_t(traces[:end], is_fixed[:end])
-        )
+        assert np.allclose(result.t_scores, expected_t(traces[:end], is_fixed[:end]))
 
 
 def test_progression_includes_partial_final_step():
@@ -331,9 +327,7 @@ def test_progression_includes_partial_final_step():
 
 
 def test_progression_skips_steps_with_too_few_traces():
-    traces, plaintexts, _ = make_dataset(
-        seed=6, samples=2, is_fixed=[True, False] * 4
-    )
+    traces, plaintexts, _ = make_dataset(seed=6, samples=2, is_fixed=[True, False] * 4)
     service, _ = make_service(traces, plaintexts)
 
     # After 2 traces each group has 1 trace, so that step is skipped.
@@ -354,9 +348,7 @@ def test_progression_skips_until_both_groups_have_two():
 
 
 def test_progression_step_size_one_does_not_raise():
-    traces, plaintexts, _ = make_dataset(
-        seed=7, samples=2, is_fixed=[True, False] * 3
-    )
+    traces, plaintexts, _ = make_dataset(seed=7, samples=2, is_fixed=[True, False] * 3)
     service, _ = make_service(traces, plaintexts)
 
     results = service.calculate_trace_progression(step_size=1)
@@ -382,8 +374,12 @@ def test_calculator_matches_scipy():
     b = rng.normal(0.3, 2.0, size=(70, 3))
 
     t = TvlaCalculator.calculate_welch_t_test(
-        a.sum(axis=0), np.square(a).sum(axis=0), len(a),
-        b.sum(axis=0), np.square(b).sum(axis=0), len(b),
+        a.sum(axis=0),
+        np.square(a).sum(axis=0),
+        len(a),
+        b.sum(axis=0),
+        np.square(b).sum(axis=0),
+        len(b),
     )
 
     assert np.allclose(t, stats.ttest_ind(a, b, equal_var=False).statistic)
@@ -394,8 +390,12 @@ def test_calculator_zero_variance_returns_zero_even_when_means_differ():
     b = np.full((10, 1), 7.0)
 
     t = TvlaCalculator.calculate_welch_t_test(
-        a.sum(axis=0), np.square(a).sum(axis=0), 10,
-        b.sum(axis=0), np.square(b).sum(axis=0), 10,
+        a.sum(axis=0),
+        np.square(a).sum(axis=0),
+        10,
+        b.sum(axis=0),
+        np.square(b).sum(axis=0),
+        10,
     )
 
     assert np.array_equal(t, [0.0])
