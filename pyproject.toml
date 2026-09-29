@@ -32,7 +32,8 @@ classifiers = [
 dev = [
     "jupyter",
     "black",
-    "pytest"
+    "pytest",
+    "scipy",
 ]
 
 [tool.setuptools.packages.find]
