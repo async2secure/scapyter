@@ -89,9 +89,7 @@ class TvlaService:
             increasing trace count.
         """
         if step_size <= 0:
-            raise ValueError(
-                "step_size must be greater than 0"
-            )
+            raise ValueError("step_size must be greater than 0")
 
         self._reset()
 
@@ -146,9 +144,7 @@ class TvlaService:
         """
         _, batch_range_list = get_progress_batch(
             batch_size=batch_size,
-            progress_steps=(
-                trace_range.end - trace_range.start
-            ),
+            progress_steps=(trace_range.end - trace_range.start),
             trace_range=trace_range,
         )
 

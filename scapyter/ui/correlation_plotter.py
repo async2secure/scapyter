@@ -11,7 +11,9 @@ class CorrelationPlotter:
         """
         self.results = results
 
-    def plot_correlation_vs_samples(self, byte_index: int, known_key: int | None = None):
+    def plot_correlation_vs_samples(
+        self, byte_index: int, known_key: int | None = None
+    ):
         # Find result object
         result = next(
             (r for r in self.results if r.byte_index == byte_index),

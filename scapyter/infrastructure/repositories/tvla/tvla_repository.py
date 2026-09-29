@@ -7,9 +7,9 @@ from scapyter.domain.tvla.value_objects import TvlaResult
 
 class TvlaResultRepository:
     def save(
-            self,
-            path: str | Path,
-            result: TvlaResult,
+        self,
+        path: str | Path,
+        result: TvlaResult,
     ) -> None:
         path = Path(path)
         path.parent.mkdir(
@@ -27,15 +27,13 @@ class TvlaResultRepository:
         )
 
     def load(
-            self,
-            path: str | Path,
+        self,
+        path: str | Path,
     ) -> TvlaResult:
         path = Path(path)
 
         if not path.exists():
-            raise FileNotFoundError(
-                f"TVLA result not found: {path}"
-            )
+            raise FileNotFoundError(f"TVLA result not found: {path}")
 
         with np.load(path) as data:
             return TvlaResult(
@@ -47,14 +45,12 @@ class TvlaResultRepository:
             )
 
     def save_progression(
-            self,
-            path: str | Path,
-            results: list[TvlaResult],
+        self,
+        path: str | Path,
+        results: list[TvlaResult],
     ) -> None:
         if not results:
-            raise ValueError(
-                "Cannot save an empty TVLA progression."
-            )
+            raise ValueError("Cannot save an empty TVLA progression.")
 
         path = Path(path)
         path.parent.mkdir(
@@ -64,9 +60,7 @@ class TvlaResultRepository:
 
         np.savez(
             path,
-            t_scores=np.stack(
-                [result.t_scores for result in results]
-            ),
+            t_scores=np.stack([result.t_scores for result in results]),
             trace_start=np.array(
                 [result.trace_start for result in results],
                 dtype=np.int64,
@@ -86,15 +80,13 @@ class TvlaResultRepository:
         )
 
     def load_progression(
-            self,
-            path: str | Path,
+        self,
+        path: str | Path,
     ) -> list[TvlaResult]:
         path = Path(path)
 
         if not path.exists():
-            raise FileNotFoundError(
-                f"TVLA progression not found: {path}"
-            )
+            raise FileNotFoundError(f"TVLA progression not found: {path}")
 
         with np.load(path) as data:
             t_scores = data["t_scores"]

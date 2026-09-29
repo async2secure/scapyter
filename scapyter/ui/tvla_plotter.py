@@ -59,9 +59,7 @@ class TvlaPlotter:
         ax.set_xlabel("Sample")
         ax.set_ylabel("Welch's t-score")
 
-        ax.set_title(
-            f"TVLA ({result.trace_start}-{result.trace_end} traces)"
-        )
+        ax.set_title(f"TVLA ({result.trace_start}-{result.trace_end} traces)")
 
         ax.grid(alpha=0.3)
         ax.legend()
@@ -79,23 +77,14 @@ class TvlaPlotter:
         ax: plt.Axes | None = None,
     ) -> plt.Axes:
         if not results:
-            raise ValueError(
-                "Cannot plot an empty TVLA progression."
-            )
+            raise ValueError("Cannot plot an empty TVLA progression.")
 
         if ax is None:
             _, ax = plt.subplots(figsize=(10, 5))
 
-        trace_counts = np.array(
-            [result.trace_end for result in results]
-        )
+        trace_counts = np.array([result.trace_end for result in results])
 
-        max_t_scores = np.array(
-            [
-                np.max(np.abs(result.t_scores))
-                for result in results
-            ]
-        )
+        max_t_scores = np.array([np.max(np.abs(result.t_scores)) for result in results])
 
         ax.plot(
             trace_counts,
