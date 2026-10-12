@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 from scapyter.domain.analysis.correlation.cpa import CpaCorrelation
 from scapyter.domain.analysis.correlation.trace_statistics_accumulator import (
@@ -13,7 +14,14 @@ from scapyter.domain.analysis.correlation.value_objects.progressive_cpa_result i
 from scapyter.domain.leakage_functions.leakage_functions import Monobit
 from scapyter.domain.leakage_model.leakage_model import LeakageModel
 from scapyter.domain.progress_range.progress_range import get_progress_batch
+from scapyter.domain.repository.project_file_reader import ProjectFileReader
 from scapyter.domain.targets.targets import ChosenPlaintextRegisterDeltaByte
+from scapyter.domain.value_object import (
+    CpaByteResult,
+    DataSource,
+    KeyByteGuesses,
+    RangeParameters,
+)
 from scapyter.domain.value_object import (
     TraceAndModeledLeakage,
 )
@@ -80,7 +88,12 @@ class SumAbsCorrelationService:
         snapshots: list[ProgressiveCpaResult] = []
         next_step_target = step  # first checkpoint, only used if step is not None
 
-        for batch_range in batch_range_list:
+        for batch_range in tqdm(
+                batch_range_list,
+                desc=f"CPA byte {byte_location}",
+                unit="batch",
+                total=len(batch_range_list),
+        ):
             batch = self._project_file_reader.get_batch(
                 batch_range,
                 sample_range=self._range_parameters.sample_range,
@@ -138,14 +151,6 @@ Not run against your real classes (LeakageModel, Monobit,
 ChosenPlaintextRegisterDeltaByte are not available to me). Adjust the
 imports below to your package layout.
 """
-
-from scapyter.domain.value_object import (
-    CpaByteResult,
-    DataSource,
-    KeyByteGuesses,
-    RangeParameters,
-)
-from scapyter.domain.repository.project_file_reader import ProjectFileReader
 
 
 class ChosenPlaintextRegisterAttack:
