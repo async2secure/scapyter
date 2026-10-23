@@ -2,90 +2,16 @@ from abc import abstractmethod, ABC
 
 import numpy as np
 from scapyter.domain.targets.constants.sbox_values import SBOX, INV_SBOX
-
-
-def inverse_shift_rows(state: np.ndarray) -> np.ndarray:
-    """
-    Apply AES inverse ShiftRows.
-
-    Input shape:
-        (..., 16)
-
-    AES state:
-
-        0   1   2   3
-        4   5   6   7
-        8   9  10  11
-        12 13  14  15
-    """
-    state = np.asarray(state)
-
-    if state.shape[-1] != 16:
-        raise ValueError(f"Expected last dimension to be 16, got {state.shape}")
-
-    return state[
-        ...,
-        [
-            0,
-            13,
-            10,
-            7,
-            4,
-            1,
-            14,
-            11,
-            8,
-            5,
-            2,
-            15,
-            12,
-            9,
-            6,
-            3,
-        ],
-    ]
-
-
-def shift_rows(state: np.ndarray) -> np.ndarray:
-    """
-    Apply AES ShiftRows.
-
-    Input shape:
-        (..., 16)
-
-    AES state:
-
-        0   1   2   3
-        4   5   6   7
-        8   9  10  11
-        12 13  14  15
-    """
-    state = np.asarray(state)
-
-    if state.shape[-1] != 16:
-        raise ValueError(f"Expected last dimension to be 16, got {state.shape}")
-
-    return state[
-        ...,
-        [
-            0,
-            5,
-            10,
-            15,
-            4,
-            9,
-            14,
-            3,
-            8,
-            13,
-            2,
-            7,
-            12,
-            1,
-            6,
-            11,
-        ],
-    ]
+from scapyter.domain.targets.utils import (
+    inverse_shift_rows,
+    shift_rows,
+    mix_columns,
+    FMUL,
+    MC,
+    BMUL,
+    IMC,
+    inverse_mix_columns,
+)
 
 
 class Target(ABC):
@@ -193,32 +119,6 @@ class SboxInputOutputHammingDistance(Target):
         return state ^ sbox_out
 
 
-def _gmul(a: int, b: int) -> int:
-    r = 0
-    while b:
-        if b & 1:
-            r ^= a
-        a = ((a << 1) ^ 0x11B) & 0xFF if a & 0x80 else a << 1
-        b >>= 1
-    return r
-
-
-_FMUL = {
-    c: np.array([_gmul(x, c) for x in range(256)], dtype=np.uint8) for c in (1, 2, 3)
-}
-_BMUL = {
-    c: np.array([_gmul(x, c) for x in range(256)], dtype=np.uint8)
-    for c in (9, 11, 13, 14)
-}
-_IMC = [
-    [14, 11, 13, 9],
-    [9, 14, 11, 13],
-    [13, 9, 14, 11],
-    [11, 13, 9, 14],
-]  # InvMixColumns
-_MC = [[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]]  # MixColumns matrix
-
-
 class ChosenCiphertextDeltaByte(Target):
     def __init__(self, output_byte: int) -> None:
         if output_byte not in (0, 1, 2, 3):
@@ -230,7 +130,7 @@ class ChosenCiphertextDeltaByte(Target):
         col = (byte_location // 4 + row) % 4
         s = INV_SBOX[known_data[:, byte_location] ^ key_guess]
         return (
-            _BMUL[_IMC[self.output_byte][row]][s]
+            BMUL[IMC[self.output_byte][row]][s]
             ^ known_data[:, 4 * col + self.output_byte]
         )
 
@@ -246,6 +146,63 @@ class ChosenPlaintextRegisterDeltaByte(Target):
         col = (byte_location // 4 - row) % 4
         s = SBOX[known_data[:, byte_location] ^ key_guess]
         return (
-            _FMUL[_MC[self.output_byte][row]][s]
+            FMUL[MC[self.output_byte][row]][s]
             ^ known_data[:, 4 * col + self.output_byte]
+        )
+
+
+class Round2RegisterDeltaByte(Target):
+    def __init__(self, output_byte: int, round_key_0: np.ndarray) -> None:
+        if output_byte not in (0, 1, 2, 3):
+            raise ValueError(f"output_byte must be 0..3, not {output_byte}")
+        self.output_byte = output_byte
+        self.round_key_0 = np.asarray(round_key_0, dtype=np.uint8)
+
+    def calculate(self, known_data, byte_location, key_guess, meta=None) -> np.ndarray:
+        """byte_location is an R1 BYTE INDEX (0..15), i.e. the k1 byte being guessed -- NOT the
+        plaintext byte that varies. Pick the trace block with plaintext_byte_for(byte_location),
+        but still pass byte_location (the R1 index) here."""
+
+        known_part = mix_columns(
+            shift_rows(SBOX[known_data ^ self.round_key_0])
+        )  # R1 without k1
+        s = SBOX[known_part[:, byte_location] ^ np.uint8(key_guess)]
+
+        row = byte_location % 4
+        col = (byte_location // 4 - row) % 4
+        return (
+            FMUL[MC[self.output_byte][row]][s]
+            ^ known_part[:, 4 * col + self.output_byte]
+        )
+
+
+class Round13RegisterDeltaByte(Target):
+    """
+    AES-256, chosen ciphertext, K14 known.
+    byte_location indexes the equivalent key K13' = IMC(K13), NOT K13.
+    """
+
+    def __init__(self, output_byte: int, round_key_14: np.ndarray) -> None:
+        if output_byte not in (0, 1, 2, 3):
+            raise ValueError(f"output_byte must be 0..3, not {output_byte}")
+        self.output_byte = output_byte
+        self.round_key_14 = np.asarray(round_key_14, dtype=np.uint8)
+
+    @staticmethod
+    def ciphertext_byte_for(byte_location: int) -> int:
+        # Row 0 is not moved by ISR, so varying C[4*col] makes exactly
+        # column (byte_location // 4) of T vary.
+        return 4 * (byte_location // 4)
+
+    def calculate(self, known_data, byte_location, key_guess, meta=None) -> np.ndarray:
+        known_part = inverse_mix_columns(
+            INV_SBOX[inverse_shift_rows(known_data ^ self.round_key_14)]
+        )
+        s = INV_SBOX[known_part[:, byte_location] ^ np.uint8(key_guess)]
+
+        row = byte_location % 4
+        col = (byte_location // 4 + row) % 4
+        return (
+            BMUL[IMC[self.output_byte][row]][s]
+            ^ known_part[:, 4 * col + self.output_byte]
         )
