@@ -29,8 +29,8 @@ class TracePlotter:
         batch = self.repo.get_batch(trace_range, sample_range=sample_range)
 
         plt.figure(figsize=(12, 5))
-        for i in range(len(batch.trace)):
-            plt.plot(batch.trace[i], alpha=alpha, linewidth=0.5)
+        for i in range(len(batch.traces)):
+            plt.plot(batch.traces[i], alpha=alpha, linewidth=0.5)
 
         plt.title(f"Overlay: Traces {trace_range.start} to {trace_range.end}")
         plt.xlabel("Sample Index")
