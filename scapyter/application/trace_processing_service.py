@@ -2,8 +2,8 @@ from tqdm import tqdm
 
 from scapyter.domain.signal_processing.trace_processor import TraceProcessor
 from scapyter.domain.value_object import Range, RangeParameters
-from scapyter.infrastructure.h5_project_file_reader import H5ProjectFileReader
-from scapyter.infrastructure.h5_project_file_writer import H5ProjectFileWriter
+from scapyter.infrastructure.h5.readers.h5_project_file_reader import H5ProjectFileReader
+from scapyter.infrastructure.h5.writers.h5_project_file_writer import H5ProjectFileWriter
 
 
 class TraceProcessingService:
